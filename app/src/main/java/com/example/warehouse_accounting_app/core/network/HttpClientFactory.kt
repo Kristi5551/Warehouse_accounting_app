@@ -40,7 +40,7 @@ fun createHttpClient(authDataStore: AuthDataStore): HttpClient = HttpClient(Andr
         }
     }
     defaultRequest {
-        url(AppConfig.API_BASE_URL)
+        url("${AppConfig.BASE_URL.trimEnd('/')}/")
     }
     expectSuccess = false
 }

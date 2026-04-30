@@ -12,21 +12,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
 import com.example.warehouse_accounting_app.core.ui.components.AppButton
 import com.example.warehouse_accounting_app.core.ui.components.AppTextField
 import com.example.warehouse_accounting_app.core.ui.components.ErrorContent
 import com.example.warehouse_accounting_app.core.ui.components.LoadingContent
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(
+    viewModelFactory: WarehouseViewModelFactory,
     onLoggedIn: () -> Unit,
     onRegister: () -> Unit,
-    viewModel: LoginViewModel = koinViewModel(),
 ) {
+    val viewModel: LoginViewModel = viewModel(factory = viewModelFactory)
     val state by viewModel.state.collectAsStateWithLifecycle()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -46,6 +50,7 @@ fun LoginScreen(
             value = state.password,
             onValueChange = { viewModel.onEvent(LoginEvent.PasswordChanged(it)) },
             label = "Пароль",
+            visualTransformation = PasswordVisualTransformation(),
         )
         state.errorMessage?.let { msg ->
             Spacer(Modifier.height(8.dp))
@@ -55,11 +60,14 @@ fun LoginScreen(
         if (state.isLoading) {
             LoadingContent()
         } else {
-            AppButton("Войти") {
+            AppButton(
+                text = "Войти",
+                enabled = !state.isLoading,
+            ) {
                 viewModel.onEvent(LoginEvent.Submit, onSuccess = onLoggedIn)
             }
             Spacer(Modifier.height(8.dp))
-            AppButton("Регистрация") {
+            AppButton(text = "Зарегистрироваться") {
                 viewModel.onEvent(LoginEvent.RegisterNavigation, onRegister = onRegister)
             }
         }

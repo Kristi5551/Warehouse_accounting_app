@@ -11,18 +11,26 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
 import com.example.warehouse_accounting_app.core.navigation.AppRoutes
 import com.example.warehouse_accounting_app.core.ui.components.AppButton
-import org.koin.androidx.compose.koinViewModel
+import com.example.warehouse_accounting_app.core.ui.components.ErrorContent
+import com.example.warehouse_accounting_app.core.ui.components.LoadingContent
 
 @Composable
 fun DashboardScreen(
+    viewModelFactory: WarehouseViewModelFactory,
     onNavigate: (String) -> Unit,
     onLogout: () -> Unit,
-    viewModel: DashboardViewModel = koinViewModel(),
 ) {
+    val viewModel: DashboardViewModel = viewModel(factory = viewModelFactory)
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -30,7 +38,18 @@ fun DashboardScreen(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Text("Панель", style = MaterialTheme.typography.headlineSmall)
+        Text("Складской учет", style = MaterialTheme.typography.headlineSmall)
+        when {
+            state.isLoading -> LoadingContent()
+            state.errorMessage != null -> ErrorContent(state.errorMessage!!)
+            state.user != null -> {
+                val u = state.user!!
+                Text("ФИО: ${u.fullName}", style = MaterialTheme.typography.bodyLarge)
+                Text("Email: ${u.email}", style = MaterialTheme.typography.bodyLarge)
+                Text("Роль: ${u.role.name}", style = MaterialTheme.typography.bodyLarge)
+                Text("Статус: ${u.status.name}", style = MaterialTheme.typography.bodyLarge)
+            }
+        }
         Spacer(Modifier.height(8.dp))
         routeButtons(onNavigate)
         Spacer(Modifier.height(16.dp))

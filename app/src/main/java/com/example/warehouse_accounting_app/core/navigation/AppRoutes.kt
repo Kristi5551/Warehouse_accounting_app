@@ -1,6 +1,7 @@
 package com.example.warehouse_accounting_app.core.navigation
 
 object AppRoutes {
+    const val Splash = "splash"
     const val Login = "login"
     const val Register = "register"
     const val Dashboard = "dashboard"

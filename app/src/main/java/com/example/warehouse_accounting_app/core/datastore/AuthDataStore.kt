@@ -22,7 +22,9 @@ class AuthDataStore(
         val token = stringPreferencesKey("jwt_token")
     }
 
-    val tokenFlow: Flow<String?> = ds.data.map { it[Keys.token] }
+    fun observeToken(): Flow<String?> = ds.data.map { it[Keys.token] }
+
+    suspend fun getTokenOnce(): String? = observeToken().first()
 
     suspend fun saveToken(token: String) {
         ds.edit { it[Keys.token] = token }
@@ -32,5 +34,5 @@ class AuthDataStore(
         ds.edit { it.remove(Keys.token) }
     }
 
-    override suspend fun getToken(): String? = tokenFlow.first()
+    override suspend fun getToken(): String? = getTokenOnce()
 }

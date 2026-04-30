@@ -2,6 +2,7 @@ package com.example.warehouse_accounting_app.presentation.auth.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.warehouse_accounting_app.core.result.AppResult
 import com.example.warehouse_accounting_app.domain.usecase.auth.LoginUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,22 +28,17 @@ class LoginViewModel(
     private fun submit(onSuccess: () -> Unit) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
-            val email = _state.value.email.trim()
+            val email = _state.value.email
             val password = _state.value.password
-            if (email.isBlank() || password.isBlank()) {
-                _state.update { it.copy(isLoading = false, errorMessage = "Заполните email и пароль") }
-                return@launch
-            }
-            val result = login(email, password)
-            result.fold(
-                onSuccess = {
+            when (val result = login(email, password)) {
+                is AppResult.Success -> {
                     _state.update { it.copy(isLoading = false) }
                     onSuccess()
-                },
-                onFailure = { err ->
-                    _state.update { it.copy(isLoading = false, errorMessage = err.message ?: "Ошибка входа") }
-                },
-            )
+                }
+                is AppResult.Error -> {
+                    _state.update { it.copy(isLoading = false, errorMessage = result.message) }
+                }
+            }
         }
     }
 }

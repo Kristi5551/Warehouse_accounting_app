@@ -1,16 +1,8 @@
 package com.example.warehouse_accounting_app
 
 import android.app.Application
-import com.example.warehouse_accounting_app.di.appModule
-import org.koin.android.ext.koin.androidContext
-import org.koin.core.context.startKoin
+import com.example.warehouse_accounting_app.core.di.AppContainer
 
 class WarehouseAccountingApp : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        startKoin {
-            androidContext(this@WarehouseAccountingApp)
-            modules(appModule)
-        }
-    }
+    val container: AppContainer by lazy { AppContainer(this) }
 }
