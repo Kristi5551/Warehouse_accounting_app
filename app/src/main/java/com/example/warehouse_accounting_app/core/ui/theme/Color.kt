@@ -1,4 +1,4 @@
-package com.example.warehouse_accounting_app.ui.theme
+package com.example.warehouse_accounting_app.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
