@@ -5,8 +5,6 @@ import com.example.warehouse_accounting_app.domain.model.Product
 import com.example.warehouse_accounting_app.domain.model.StockBalance
 import com.example.warehouse_accounting_app.domain.model.StockOperation
 import com.example.warehouse_accounting_app.domain.model.StockOperationType
-import com.example.warehouse_accounting_app.domain.model.User
-import com.example.warehouse_accounting_app.domain.model.UserRole
 import com.example.warehouse_accounting_app.domain.model.reports.LowStockReport
 import com.example.warehouse_accounting_app.domain.model.reports.OperationReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockSummaryReport
@@ -16,16 +14,6 @@ import com.example.warehouse_accounting_app.domain.repository.ProductRepository
 import com.example.warehouse_accounting_app.domain.repository.ReportRepository
 import com.example.warehouse_accounting_app.domain.repository.StockHistoryFilter
 import com.example.warehouse_accounting_app.domain.repository.StockRepository
-import com.example.warehouse_accounting_app.domain.repository.UserRepository
-
-class StubUserRepository : UserRepository {
-    override suspend fun getUsers(): Result<List<User>> = Result.success(emptyList())
-    override suspend fun getPendingUsers(): Result<List<User>> = Result.success(emptyList())
-    override suspend fun approveUser(id: Long): Result<Unit> = Result.success(Unit)
-    override suspend fun blockUser(id: Long): Result<Unit> = Result.success(Unit)
-    override suspend fun unblockUser(id: Long): Result<Unit> = Result.success(Unit)
-    override suspend fun changeRole(id: Long, role: UserRole): Result<Unit> = Result.success(Unit)
-}
 
 class StubCategoryRepository : CategoryRepository {
     override suspend fun getCategories(): Result<List<Category>> = Result.success(emptyList())

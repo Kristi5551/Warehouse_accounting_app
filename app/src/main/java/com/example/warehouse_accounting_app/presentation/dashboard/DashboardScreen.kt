@@ -19,6 +19,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
 import com.example.warehouse_accounting_app.core.navigation.AppRoutes
 import com.example.warehouse_accounting_app.core.ui.components.AppButton
+import com.example.warehouse_accounting_app.domain.model.User
+import com.example.warehouse_accounting_app.domain.model.UserRole
 import com.example.warehouse_accounting_app.core.ui.components.ErrorContent
 import com.example.warehouse_accounting_app.core.ui.components.LoadingContent
 
@@ -51,29 +53,31 @@ fun DashboardScreen(
             }
         }
         Spacer(Modifier.height(8.dp))
-        routeButtons(onNavigate)
+        state.user?.let { user -> routeButtons(onNavigate, user) }
         Spacer(Modifier.height(16.dp))
         AppButton("Выйти") { viewModel.onLogout(onDone = onLogout) }
     }
 }
 
 @Composable
-private fun routeButtons(onNavigate: (String) -> Unit) {
-    val routes = listOf(
-        AppRoutes.Users to "Пользователи",
-        AppRoutes.Categories to "Категории",
-        AppRoutes.Products to "Товары",
-        AppRoutes.ProductDetails to "Карточка товара (заглушка)",
-        AppRoutes.ProductEdit to "Редактирование товара",
-        AppRoutes.StockBalances to "Остатки",
-        AppRoutes.Receipt to "Приход",
-        AppRoutes.Issue to "Расход",
-        AppRoutes.WriteOff to "Списание",
-        AppRoutes.Inventory to "Инвентаризация",
-        AppRoutes.OperationHistory to "История операций",
-        AppRoutes.Reports to "Отчеты",
-        AppRoutes.Profile to "Профиль",
-    )
+private fun routeButtons(onNavigate: (String) -> Unit, currentUser: User) {
+    val routes = buildList {
+        if (currentUser.role == UserRole.ADMIN) {
+            add(AppRoutes.Users to "Пользователи")
+        }
+        add(AppRoutes.Categories to "Категории")
+        add(AppRoutes.Products to "Товары")
+        add(AppRoutes.ProductDetails to "Карточка товара (заглушка)")
+        add(AppRoutes.ProductEdit to "Редактирование товара")
+        add(AppRoutes.StockBalances to "Остатки")
+        add(AppRoutes.Receipt to "Приход")
+        add(AppRoutes.Issue to "Расход")
+        add(AppRoutes.WriteOff to "Списание")
+        add(AppRoutes.Inventory to "Инвентаризация")
+        add(AppRoutes.OperationHistory to "История операций")
+        add(AppRoutes.Reports to "Отчеты")
+        add(AppRoutes.Profile to "Профиль")
+    }
     routes.forEach { (route, label) ->
         AppButton(label) { onNavigate(route) }
     }

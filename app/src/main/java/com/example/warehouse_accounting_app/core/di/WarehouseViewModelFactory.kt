@@ -6,6 +6,7 @@ import com.example.warehouse_accounting_app.presentation.auth.login.LoginViewMod
 import com.example.warehouse_accounting_app.presentation.auth.register.RegisterViewModel
 import com.example.warehouse_accounting_app.presentation.dashboard.DashboardViewModel
 import com.example.warehouse_accounting_app.presentation.splash.SplashViewModel
+import com.example.warehouse_accounting_app.presentation.users.UserListViewModel
 
 class WarehouseViewModelFactory(
     private val container: AppContainer,
@@ -22,6 +23,16 @@ class WarehouseViewModelFactory(
                 RegisterViewModel(c.registerUseCase) as T
             modelClass.isAssignableFrom(DashboardViewModel::class.java) ->
                 DashboardViewModel(c.logoutUseCase, c.getCurrentUserUseCase) as T
+            modelClass.isAssignableFrom(UserListViewModel::class.java) ->
+                UserListViewModel(
+                    c.getUsersUseCase,
+                    c.getPendingUsersUseCase,
+                    c.approveUserUseCase,
+                    c.blockUserUseCase,
+                    c.unblockUserUseCase,
+                    c.changeUserRoleUseCase,
+                    c.getCurrentUserUseCase,
+                ) as T
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
         }
     }

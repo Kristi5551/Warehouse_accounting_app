@@ -20,6 +20,7 @@ import com.example.warehouse_accounting_app.core.ui.components.AppButton
 import com.example.warehouse_accounting_app.presentation.auth.login.LoginScreen
 import com.example.warehouse_accounting_app.presentation.auth.register.RegisterScreen
 import com.example.warehouse_accounting_app.presentation.dashboard.DashboardScreen
+import com.example.warehouse_accounting_app.presentation.users.UserListScreen
 import com.example.warehouse_accounting_app.presentation.splash.SplashDestination
 import com.example.warehouse_accounting_app.presentation.splash.SplashScreenContent
 import com.example.warehouse_accounting_app.presentation.splash.SplashViewModel
@@ -86,7 +87,18 @@ fun AppNavGraph(
             )
         }
         composable(AppRoutes.Profile) { Placeholder("Профиль") { navController.popBackStack() } }
-        composable(AppRoutes.Users) { Placeholder("Пользователи") { navController.popBackStack() } }
+        composable(AppRoutes.Users) {
+            UserListScreen(
+                viewModelFactory = viewModelFactory,
+                onBack = { navController.popBackStack() },
+                onSessionExpired = {
+                    navController.navigate(AppRoutes.Login) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
         composable(AppRoutes.Categories) { Placeholder("Категории") { navController.popBackStack() } }
         composable(AppRoutes.CategoryEdit) { Placeholder("Категория") { navController.popBackStack() } }
         composable(AppRoutes.Products) { Placeholder("Товары") { navController.popBackStack() } }
