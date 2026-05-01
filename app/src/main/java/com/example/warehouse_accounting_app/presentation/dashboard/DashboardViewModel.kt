@@ -41,4 +41,22 @@ class DashboardViewModel(
             onDone()
         }
     }
+
+    fun refresh() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, errorMessage = null, user = null) }
+            when (val result = getCurrentUser()) {
+                is AppResult.Success ->
+                    _state.update { it.copy(user = result.data, isLoading = false, errorMessage = null) }
+                is AppResult.Error ->
+                    _state.update {
+                        it.copy(
+                            user = null,
+                            isLoading = false,
+                            errorMessage = result.message,
+                        )
+                    }
+            }
+        }
+    }
 }

@@ -27,16 +27,24 @@ import com.example.warehouse_accounting_app.presentation.auth.register.RegisterS
 import com.example.warehouse_accounting_app.presentation.categories.CategoryEditScreen
 import com.example.warehouse_accounting_app.presentation.categories.CategoryListScreen
 import com.example.warehouse_accounting_app.presentation.dashboard.DashboardScreen
+import com.example.warehouse_accounting_app.presentation.operations.OperationHistoryScreen
 import com.example.warehouse_accounting_app.presentation.products.ProductDetailsScreen
 import com.example.warehouse_accounting_app.presentation.products.ProductEditScreen
 import com.example.warehouse_accounting_app.presentation.products.ProductListScreen
 import com.example.warehouse_accounting_app.presentation.profile.ProfileScreen
+import com.example.warehouse_accounting_app.presentation.reports.ReportsScreen
 import com.example.warehouse_accounting_app.presentation.splash.SplashDestination
 import com.example.warehouse_accounting_app.presentation.splash.SplashScreenContent
 import com.example.warehouse_accounting_app.presentation.splash.SplashViewModel
+import com.example.warehouse_accounting_app.presentation.stock.InventoryScreen
+import com.example.warehouse_accounting_app.presentation.stock.IssueScreen
+import com.example.warehouse_accounting_app.presentation.stock.LowStockScreen
+import com.example.warehouse_accounting_app.presentation.stock.ReceiptScreen
+import com.example.warehouse_accounting_app.presentation.stock.StockBalanceScreen
+import com.example.warehouse_accounting_app.presentation.stock.WriteOffScreen
 import com.example.warehouse_accounting_app.presentation.users.UserListScreen
 
-private fun NavHostController.sessionExpired() {
+private fun NavHostController.logout() {
     navigate(AppRoutes.Login) { popUpTo(graph.id) { inclusive = true }; launchSingleTop = true }
 }
 
@@ -47,6 +55,7 @@ fun AppNavGraph(
     modifier: Modifier = Modifier,
 ) {
     NavHost(navController = navController, startDestination = AppRoutes.Splash, modifier = modifier) {
+
         composable(AppRoutes.Splash) {
             val vm: SplashViewModel = viewModel(factory = viewModelFactory)
             val destination by vm.destination.collectAsStateWithLifecycle()
@@ -60,6 +69,7 @@ fun AppNavGraph(
             }
             SplashScreenContent()
         }
+
         composable(AppRoutes.Login) {
             LoginScreen(
                 viewModelFactory = viewModelFactory,
@@ -67,29 +77,25 @@ fun AppNavGraph(
                 onRegister = { navController.navigate(AppRoutes.Register) },
             )
         }
+
         composable(AppRoutes.Register) {
             RegisterScreen(viewModelFactory = viewModelFactory, onBackToLogin = { navController.popBackStack() })
         }
+
         composable(AppRoutes.Dashboard) {
             DashboardScreen(
                 viewModelFactory = viewModelFactory,
                 onNavigate = { navController.navigate(it) },
-                onLogout = { navController.sessionExpired() },
+                onLogout = { navController.logout() },
             )
         }
+
         composable(AppRoutes.Profile) {
-            ProfileScreen(
-                viewModelFactory = viewModelFactory,
-                onBack = { navController.popBackStack() },
-                onLogout = { navController.sessionExpired() },
-            )
+            ProfileScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() }, onLogout = { navController.logout() })
         }
+
         composable(AppRoutes.Users) {
-            UserListScreen(
-                viewModelFactory = viewModelFactory,
-                onBack = { navController.popBackStack() },
-                onSessionExpired = { navController.sessionExpired() },
-            )
+            UserListScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() }, onSessionExpired = { navController.logout() })
         }
 
         // ── Categories ──────────────────────────────────────────────────────
@@ -99,24 +105,14 @@ fun AppNavGraph(
                 onNavigateToCreate = { navController.navigate(AppRoutes.CategoryNew) },
                 onNavigateToEdit = { navController.navigate(AppRoutes.categoryEdit(it)) },
                 onBack = { navController.popBackStack() },
-                onSessionExpired = { navController.sessionExpired() },
+                onSessionExpired = { navController.logout() },
             )
         }
         composable(AppRoutes.CategoryNew) {
-            CategoryEditScreen(
-                viewModelFactory = viewModelFactory, categoryId = null,
-                onSaved = { navController.popBackStack() },
-                onBack = { navController.popBackStack() },
-                onSessionExpired = { navController.sessionExpired() },
-            )
+            CategoryEditScreen(viewModelFactory = viewModelFactory, categoryId = null, onSaved = { navController.popBackStack() }, onBack = { navController.popBackStack() }, onSessionExpired = { navController.logout() })
         }
         composable(AppRoutes.CategoryEdit, arguments = listOf(navArgument("id") { type = NavType.LongType })) { back ->
-            CategoryEditScreen(
-                viewModelFactory = viewModelFactory, categoryId = back.arguments?.getLong("id"),
-                onSaved = { navController.popBackStack() },
-                onBack = { navController.popBackStack() },
-                onSessionExpired = { navController.sessionExpired() },
-            )
+            CategoryEditScreen(viewModelFactory = viewModelFactory, categoryId = back.arguments?.getLong("id"), onSaved = { navController.popBackStack() }, onBack = { navController.popBackStack() }, onSessionExpired = { navController.logout() })
         }
 
         // ── Products ─────────────────────────────────────────────────────────
@@ -127,55 +123,54 @@ fun AppNavGraph(
                 onNavigateToEdit = { navController.navigate(AppRoutes.productEdit(it)) },
                 onNavigateToDetails = { navController.navigate(AppRoutes.productDetails(it)) },
                 onBack = { navController.popBackStack() },
-                onSessionExpired = { navController.sessionExpired() },
+                onSessionExpired = { navController.logout() },
             )
         }
         composable(AppRoutes.ProductNew) {
-            ProductEditScreen(
-                viewModelFactory = viewModelFactory, productId = null,
-                onSaved = { navController.popBackStack() },
-                onBack = { navController.popBackStack() },
-                onSessionExpired = { navController.sessionExpired() },
-            )
+            ProductEditScreen(viewModelFactory = viewModelFactory, productId = null, onSaved = { navController.popBackStack() }, onBack = { navController.popBackStack() }, onSessionExpired = { navController.logout() })
         }
         composable(AppRoutes.ProductDetails, arguments = listOf(navArgument("id") { type = NavType.LongType })) { back ->
-            val id = back.arguments!!.getLong("id")
-            ProductDetailsScreen(
-                viewModelFactory = viewModelFactory, productId = id,
-                onBack = { navController.popBackStack() },
-                onNavigateToEdit = { navController.navigate(AppRoutes.productEdit(it)) },
-                onSessionExpired = { navController.sessionExpired() },
-            )
+            ProductDetailsScreen(viewModelFactory = viewModelFactory, productId = back.arguments!!.getLong("id"), onBack = { navController.popBackStack() }, onNavigateToEdit = { navController.navigate(AppRoutes.productEdit(it)) }, onSessionExpired = { navController.logout() })
         }
         composable(AppRoutes.ProductEdit, arguments = listOf(navArgument("id") { type = NavType.LongType })) { back ->
-            ProductEditScreen(
-                viewModelFactory = viewModelFactory, productId = back.arguments?.getLong("id"),
-                onSaved = { navController.popBackStack() },
-                onBack = { navController.popBackStack() },
-                onSessionExpired = { navController.sessionExpired() },
-            )
+            ProductEditScreen(viewModelFactory = viewModelFactory, productId = back.arguments?.getLong("id"), onSaved = { navController.popBackStack() }, onBack = { navController.popBackStack() }, onSessionExpired = { navController.logout() })
         }
 
-        // ── Placeholders ─────────────────────────────────────────────────────
-        composable(AppRoutes.StockBalances) { Placeholder("Остатки") { navController.popBackStack() } }
-        composable(AppRoutes.Receipt) { Placeholder("Приход") { navController.popBackStack() } }
-        composable(AppRoutes.Issue) { Placeholder("Расход") { navController.popBackStack() } }
-        composable(AppRoutes.WriteOff) { Placeholder("Списание") { navController.popBackStack() } }
-        composable(AppRoutes.Inventory) { Placeholder("Инвентаризация") { navController.popBackStack() } }
-        composable(AppRoutes.OperationHistory) { Placeholder("История операций") { navController.popBackStack() } }
-        composable(AppRoutes.Reports) { Placeholder("Отчёты") { navController.popBackStack() } }
+        // ── Stock ─────────────────────────────────────────────────────────────
+        composable(AppRoutes.StockBalances) {
+            StockBalanceScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
+        }
+        composable(AppRoutes.LowStock) {
+            LowStockScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
+        }
+        composable(AppRoutes.Receipt) {
+            ReceiptScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() }, onSuccess = { navController.navigate(AppRoutes.StockBalances) { popUpTo(AppRoutes.Receipt) { inclusive = true } } })
+        }
+        composable(AppRoutes.Issue) {
+            IssueScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() }, onSuccess = { navController.navigate(AppRoutes.StockBalances) { popUpTo(AppRoutes.Issue) { inclusive = true } } })
+        }
+        composable(AppRoutes.WriteOff) {
+            WriteOffScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() }, onSuccess = { navController.navigate(AppRoutes.StockBalances) { popUpTo(AppRoutes.WriteOff) { inclusive = true } } })
+        }
+        composable(AppRoutes.Inventory) {
+            InventoryScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() }, onSuccess = { navController.navigate(AppRoutes.StockBalances) { popUpTo(AppRoutes.Inventory) { inclusive = true } } })
+        }
+
+        // ── Operations & Reports ───────────────────────────────────────────────
+        composable(AppRoutes.OperationHistory) {
+            OperationHistoryScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
+        }
+        composable(AppRoutes.Reports) {
+            ReportsScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
+        }
     }
 }
 
 @Composable
 private fun Placeholder(title: String, onBack: () -> Unit) {
     AppScaffold(topBar = { AppTopBar(title = title, onBack = onBack) }) { padding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text("Раздел «$title» в разработке", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Column(modifier = Modifier.fillMaxSize().padding(padding), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Text("Раздел находится в разработке", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

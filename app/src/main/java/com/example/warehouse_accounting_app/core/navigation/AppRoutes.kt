@@ -18,6 +18,7 @@ object AppRoutes {
     const val ProductEdit = "productEdit/{id}"
     fun productEdit(id: Long) = "productEdit/$id"
     const val StockBalances = "stockBalances"
+    const val LowStock = "lowStock"
     const val Receipt = "receipt"
     const val Issue = "issue"
     const val WriteOff = "writeOff"

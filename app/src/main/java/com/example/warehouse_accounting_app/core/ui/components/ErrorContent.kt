@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,6 +21,8 @@ import androidx.compose.ui.unit.dp
 fun ErrorContent(
     message: String,
     modifier: Modifier = Modifier,
+    onRetry: (() -> Unit)? = null,
+    retryLabel: String = "Повторить",
 ) {
     Column(
         modifier = modifier
@@ -40,5 +43,10 @@ fun ErrorContent(
             color = MaterialTheme.colorScheme.error,
             textAlign = TextAlign.Center,
         )
+        if (onRetry != null) {
+            Button(onClick = onRetry) {
+                Text(retryLabel)
+            }
+        }
     }
 }

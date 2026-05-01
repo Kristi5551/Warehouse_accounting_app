@@ -1,5 +1,7 @@
 package com.example.warehouse_accounting_app.data.repository
 
+import android.util.Log
+import com.example.warehouse_accounting_app.BuildConfig
 import com.example.warehouse_accounting_app.core.datastore.AuthDataStore
 import com.example.warehouse_accounting_app.core.network.ApiException
 import com.example.warehouse_accounting_app.core.network.connectivityMessage
@@ -16,6 +18,8 @@ import com.example.warehouse_accounting_app.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import java.io.IOException
 
+private const val AUTH_LOG_TAG = "WarehouseAuth"
+
 class AuthRepositoryImpl(
     private val api: AuthApi,
     private val authDataStore: AuthDataStore,
@@ -23,8 +27,20 @@ class AuthRepositoryImpl(
     override suspend fun login(email: String, password: String): AppResult<User> =
         try {
             val response = api.login(LoginRequestDto(email = email, password = password))
-            authDataStore.saveToken(response.token)
-            AppResult.Success(response.user.toDomain())
+            val received = response.token.isNotBlank()
+            if (BuildConfig.DEBUG) {
+                Log.d(AUTH_LOG_TAG, "login token received = $received")
+            }
+            if (!received) {
+                AppResult.Error("Сервер не вернул токен", IllegalStateException("empty token"))
+            } else {
+                authDataStore.saveToken(response.token)
+                if (BuildConfig.DEBUG) {
+                    val saved = !authDataStore.getTokenOnce().isNullOrBlank()
+                    Log.d(AUTH_LOG_TAG, "token saved = $saved")
+                }
+                AppResult.Success(response.user.toDomain())
+            }
         } catch (e: ApiException) {
             logApiException(e, "POST /api/auth/login")
             AppResult.Error(e.message ?: "Ошибка входа", e)
@@ -65,6 +81,10 @@ class AuthRepositoryImpl(
 
     override suspend fun getCurrentUser(): AppResult<User> =
         try {
+            if (BuildConfig.DEBUG) {
+                val available = !authDataStore.getTokenOnce().isNullOrBlank()
+                Log.d(AUTH_LOG_TAG, "token available for request = $available")
+            }
             AppResult.Success(api.me().toDomain())
         } catch (e: ApiException) {
             logApiException(e, "GET /api/auth/me")
