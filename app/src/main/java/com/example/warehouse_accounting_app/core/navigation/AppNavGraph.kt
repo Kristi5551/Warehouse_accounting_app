@@ -1,12 +1,15 @@
 package com.example.warehouse_accounting_app.core.navigation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,13 +20,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
 import com.example.warehouse_accounting_app.core.ui.components.AppButton
+import com.example.warehouse_accounting_app.core.ui.components.AppScaffold
+import com.example.warehouse_accounting_app.core.ui.components.AppTopBar
 import com.example.warehouse_accounting_app.presentation.auth.login.LoginScreen
 import com.example.warehouse_accounting_app.presentation.auth.register.RegisterScreen
 import com.example.warehouse_accounting_app.presentation.dashboard.DashboardScreen
-import com.example.warehouse_accounting_app.presentation.users.UserListScreen
+import com.example.warehouse_accounting_app.presentation.profile.ProfileScreen
 import com.example.warehouse_accounting_app.presentation.splash.SplashDestination
 import com.example.warehouse_accounting_app.presentation.splash.SplashScreenContent
 import com.example.warehouse_accounting_app.presentation.splash.SplashViewModel
+import com.example.warehouse_accounting_app.presentation.users.UserListScreen
 
 @Composable
 fun AppNavGraph(
@@ -39,9 +45,7 @@ fun AppNavGraph(
         composable(AppRoutes.Splash) {
             val splashViewModel: SplashViewModel = viewModel(factory = viewModelFactory)
             val destination by splashViewModel.destination.collectAsStateWithLifecycle()
-            LaunchedEffect(Unit) {
-                splashViewModel.startCheck()
-            }
+            LaunchedEffect(Unit) { splashViewModel.startCheck() }
             LaunchedEffect(destination) {
                 when (destination) {
                     SplashDestination.Login ->
@@ -86,7 +90,18 @@ fun AppNavGraph(
                 },
             )
         }
-        composable(AppRoutes.Profile) { Placeholder("Профиль") { navController.popBackStack() } }
+        composable(AppRoutes.Profile) {
+            ProfileScreen(
+                viewModelFactory = viewModelFactory,
+                onBack = { navController.popBackStack() },
+                onLogout = {
+                    navController.navigate(AppRoutes.Login) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
         composable(AppRoutes.Users) {
             UserListScreen(
                 viewModelFactory = viewModelFactory,
@@ -110,14 +125,27 @@ fun AppNavGraph(
         composable(AppRoutes.WriteOff) { Placeholder("Списание") { navController.popBackStack() } }
         composable(AppRoutes.Inventory) { Placeholder("Инвентаризация") { navController.popBackStack() } }
         composable(AppRoutes.OperationHistory) { Placeholder("История операций") { navController.popBackStack() } }
-        composable(AppRoutes.Reports) { Placeholder("Отчеты") { navController.popBackStack() } }
+        composable(AppRoutes.Reports) { Placeholder("Отчёты") { navController.popBackStack() } }
     }
 }
 
 @Composable
 private fun Placeholder(title: String, onBack: () -> Unit) {
-    Column(Modifier.padding(16.dp)) {
-        Text(title, style = MaterialTheme.typography.headlineSmall)
-        AppButton("Назад", onClick = onBack)
+    AppScaffold(
+        topBar = { AppTopBar(title = title, onBack = onBack) },
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(
+                text = "Раздел «$title» в разработке",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }

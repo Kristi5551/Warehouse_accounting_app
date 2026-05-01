@@ -1,10 +1,20 @@
 package com.example.warehouse_accounting_app.presentation.users
 
 import com.example.warehouse_accounting_app.domain.model.User
+import com.example.warehouse_accounting_app.domain.model.UserStatus
 
-enum class UserListFilter {
-    ALL,
-    PENDING,
+enum class UserListFilter(val label: String) {
+    ALL("Все"),
+    PENDING("Ожидают"),
+    ACTIVE("Активные"),
+    BLOCKED("Заблокированные"),
+}
+
+fun UserListFilter.matchesStatus(status: UserStatus): Boolean = when (this) {
+    UserListFilter.ALL -> true
+    UserListFilter.PENDING -> status == UserStatus.PENDING
+    UserListFilter.ACTIVE -> status == UserStatus.ACTIVE
+    UserListFilter.BLOCKED -> status == UserStatus.BLOCKED
 }
 
 data class UserListState(

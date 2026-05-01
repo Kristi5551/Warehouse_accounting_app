@@ -1,5 +1,6 @@
 package com.example.warehouse_accounting_app.data.remote.api
 
+import com.example.warehouse_accounting_app.core.config.AppConfig
 import com.example.warehouse_accounting_app.core.network.ApiException
 import com.example.warehouse_accounting_app.data.remote.dto.request.LoginRequestDto
 import com.example.warehouse_accounting_app.data.remote.dto.request.RegisterRequestDto
@@ -13,6 +14,8 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
 import kotlinx.serialization.json.Json
 
@@ -21,12 +24,18 @@ class AuthApi(
     private val json: Json,
 ) {
     suspend fun register(body: RegisterRequestDto): UserResponseDto {
-        val response = client.post("api/auth/register") { setBody(body) }
+        val response = client.post(AppConfig.url("api/auth/register")) {
+            headers.append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            setBody(body)
+        }
         return parseUserResponse(response)
     }
 
     suspend fun login(body: LoginRequestDto): AuthResponseDto {
-        val response = client.post("api/auth/login") { setBody(body) }
+        val response = client.post(AppConfig.url("api/auth/login")) {
+            headers.append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            setBody(body)
+        }
         if (!response.status.isSuccess()) {
             throw parseError(response.status.value, response.bodyAsText())
         }
@@ -34,7 +43,7 @@ class AuthApi(
     }
 
     suspend fun me(): UserResponseDto {
-        val response = client.get("api/auth/me")
+        val response = client.get(AppConfig.url("api/auth/me"))
         if (!response.status.isSuccess()) {
             throw parseError(response.status.value, response.bodyAsText())
         }
