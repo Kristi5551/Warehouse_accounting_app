@@ -34,31 +34,22 @@ class StubCategoryRepository : CategoryRepository {
 }
 
 class StubProductRepository : ProductRepository {
-    override suspend fun getProducts(categoryId: Long?, search: String?): Result<List<Product>> = Result.success(emptyList())
-    override suspend fun getProductById(id: Long): Result<Product> = Result.failure(UnsupportedOperationException("TODO"))
+    override suspend fun getProducts(search: String?, categoryId: Long?, activeOnly: Boolean): AppResult<List<Product>> =
+        AppResult.Success(emptyList())
+
+    override suspend fun getProductById(id: Long): AppResult<Product> = AppResult.Error("Not implemented")
+
     override suspend fun createProduct(
-        article: String,
-        name: String,
-        categoryId: Long,
-        unit: String,
-        purchasePrice: Double,
-        salePrice: Double,
-        minStock: Double,
-    ): Result<Product> = Result.failure(UnsupportedOperationException("TODO"))
+        article: String, name: String, categoryId: Long, unit: String,
+        purchasePrice: Double, salePrice: Double, minStock: Double,
+    ): AppResult<Product> = AppResult.Error("Not implemented")
 
     override suspend fun updateProduct(
-        id: Long,
-        article: String,
-        name: String,
-        categoryId: Long,
-        unit: String,
-        purchasePrice: Double,
-        salePrice: Double,
-        minStock: Double,
-        isActive: Boolean,
-    ): Result<Product> = Result.failure(UnsupportedOperationException("TODO"))
+        id: Long, article: String, name: String, categoryId: Long, unit: String,
+        purchasePrice: Double, salePrice: Double, minStock: Double, isActive: Boolean,
+    ): AppResult<Product> = AppResult.Error("Not implemented")
 
-    override suspend fun deleteProduct(id: Long): Result<Unit> = Result.success(Unit)
+    override suspend fun deleteProduct(id: Long): AppResult<Product> = AppResult.Error("Not implemented")
 }
 
 class StubStockRepository : StockRepository {

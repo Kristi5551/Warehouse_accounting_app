@@ -1,0 +1,52 @@
+package com.example.warehouse_accounting_app.presentation.products
+
+import com.example.warehouse_accounting_app.domain.model.Category
+import com.example.warehouse_accounting_app.domain.model.Product
+
+data class ProductListState(
+    val isLoading: Boolean = false,
+    val products: List<Product> = emptyList(),
+    val categories: List<Category> = emptyList(),
+    val searchQuery: String = "",
+    val selectedCategoryId: Long? = null,
+    val activeOnly: Boolean = true,
+    val errorMessage: String? = null,
+)
+
+val ProductListState.filtered: List<Product>
+    get() {
+        var list = products
+        if (searchQuery.isNotBlank())
+            list = list.filter {
+                it.name.contains(searchQuery, ignoreCase = true) ||
+                it.article.contains(searchQuery, ignoreCase = true)
+            }
+        if (selectedCategoryId != null)
+            list = list.filter { it.categoryId == selectedCategoryId }
+        return list
+    }
+
+data class ProductEditState(
+    val isLoading: Boolean = false,
+    val isSaving: Boolean = false,
+    val categories: List<Category> = emptyList(),
+    val article: String = "",
+    val name: String = "",
+    val selectedCategoryId: Long? = null,
+    val unit: String = "",
+    val purchasePrice: String = "",
+    val salePrice: String = "",
+    val minStock: String = "",
+    val isActive: Boolean = true,
+    val articleError: String? = null,
+    val nameError: String? = null,
+    val categoryError: String? = null,
+    val unitError: String? = null,
+    val purchasePriceError: String? = null,
+    val salePriceError: String? = null,
+    val minStockError: String? = null,
+    val errorMessage: String? = null,
+    val editingProduct: Product? = null,
+)
+
+val ProductEditState.isEditMode: Boolean get() = editingProduct != null

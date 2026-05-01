@@ -11,4 +11,6 @@ data class Product(
     val salePrice: Double,
     val minStock: Double,
     val isActive: Boolean,
+    val createdAt: String,
+    val updatedAt: String,
 )
