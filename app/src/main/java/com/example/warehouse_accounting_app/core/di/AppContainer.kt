@@ -4,16 +4,24 @@ import android.content.Context
 import com.example.warehouse_accounting_app.core.datastore.AuthDataStore
 import com.example.warehouse_accounting_app.core.network.createHttpClient
 import com.example.warehouse_accounting_app.data.remote.api.AuthApi
+import com.example.warehouse_accounting_app.data.remote.api.CategoryApi
 import com.example.warehouse_accounting_app.data.remote.api.UserApi
 import com.example.warehouse_accounting_app.data.repository.AuthRepositoryImpl
+import com.example.warehouse_accounting_app.data.repository.CategoryRepositoryImpl
 import com.example.warehouse_accounting_app.data.repository.UserRepositoryImpl
 import com.example.warehouse_accounting_app.domain.repository.AuthRepository
+import com.example.warehouse_accounting_app.domain.repository.CategoryRepository
 import com.example.warehouse_accounting_app.domain.repository.UserRepository
 import com.example.warehouse_accounting_app.domain.usecase.auth.CheckAuthStateUseCase
 import com.example.warehouse_accounting_app.domain.usecase.auth.GetCurrentUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.auth.LoginUseCase
 import com.example.warehouse_accounting_app.domain.usecase.auth.LogoutUseCase
 import com.example.warehouse_accounting_app.domain.usecase.auth.RegisterUseCase
+import com.example.warehouse_accounting_app.domain.usecase.category.CreateCategoryUseCase
+import com.example.warehouse_accounting_app.domain.usecase.category.DeleteCategoryUseCase
+import com.example.warehouse_accounting_app.domain.usecase.category.GetCategoriesUseCase
+import com.example.warehouse_accounting_app.domain.usecase.category.GetCategoryByIdUseCase
+import com.example.warehouse_accounting_app.domain.usecase.category.UpdateCategoryUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.ApproveUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.BlockUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.ChangeUserRoleUseCase
@@ -37,9 +45,11 @@ class AppContainer(
     private val httpClient = createHttpClient(authDataStore)
     private val authApi = AuthApi(httpClient, json)
     private val userApi = UserApi(httpClient, json)
+    private val categoryApi = CategoryApi(httpClient, json)
 
     val authRepository: AuthRepository = AuthRepositoryImpl(authApi, authDataStore)
     val userRepository: UserRepository = UserRepositoryImpl(userApi, authDataStore)
+    val categoryRepository: CategoryRepository = CategoryRepositoryImpl(categoryApi)
 
     val loginUseCase: LoginUseCase = LoginUseCase(authRepository)
     val registerUseCase: RegisterUseCase = RegisterUseCase(authRepository)
@@ -53,4 +63,10 @@ class AppContainer(
     val blockUserUseCase: BlockUserUseCase = BlockUserUseCase(userRepository)
     val unblockUserUseCase: UnblockUserUseCase = UnblockUserUseCase(userRepository)
     val changeUserRoleUseCase: ChangeUserRoleUseCase = ChangeUserRoleUseCase(userRepository)
+
+    val getCategoriesUseCase: GetCategoriesUseCase = GetCategoriesUseCase(categoryRepository)
+    val getCategoryByIdUseCase: GetCategoryByIdUseCase = GetCategoryByIdUseCase(categoryRepository)
+    val createCategoryUseCase: CreateCategoryUseCase = CreateCategoryUseCase(categoryRepository)
+    val updateCategoryUseCase: UpdateCategoryUseCase = UpdateCategoryUseCase(categoryRepository)
+    val deleteCategoryUseCase: DeleteCategoryUseCase = DeleteCategoryUseCase(categoryRepository)
 }

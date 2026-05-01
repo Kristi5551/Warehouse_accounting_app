@@ -15,15 +15,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
-import com.example.warehouse_accounting_app.core.ui.components.AppButton
 import com.example.warehouse_accounting_app.core.ui.components.AppScaffold
 import com.example.warehouse_accounting_app.core.ui.components.AppTopBar
 import com.example.warehouse_accounting_app.presentation.auth.login.LoginScreen
 import com.example.warehouse_accounting_app.presentation.auth.register.RegisterScreen
+import com.example.warehouse_accounting_app.presentation.categories.CategoryEditScreen
+import com.example.warehouse_accounting_app.presentation.categories.CategoryListScreen
 import com.example.warehouse_accounting_app.presentation.dashboard.DashboardScreen
 import com.example.warehouse_accounting_app.presentation.profile.ProfileScreen
 import com.example.warehouse_accounting_app.presentation.splash.SplashDestination
@@ -114,8 +117,52 @@ fun AppNavGraph(
                 },
             )
         }
-        composable(AppRoutes.Categories) { Placeholder("Категории") { navController.popBackStack() } }
-        composable(AppRoutes.CategoryEdit) { Placeholder("Категория") { navController.popBackStack() } }
+        composable(AppRoutes.Categories) {
+            CategoryListScreen(
+                viewModelFactory = viewModelFactory,
+                onNavigateToCreate = { navController.navigate(AppRoutes.CategoryNew) },
+                onNavigateToEdit = { id -> navController.navigate(AppRoutes.categoryEdit(id)) },
+                onBack = { navController.popBackStack() },
+                onSessionExpired = {
+                    navController.navigate(AppRoutes.Login) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
+        composable(AppRoutes.CategoryNew) {
+            CategoryEditScreen(
+                viewModelFactory = viewModelFactory,
+                categoryId = null,
+                onSaved = { navController.popBackStack() },
+                onBack = { navController.popBackStack() },
+                onSessionExpired = {
+                    navController.navigate(AppRoutes.Login) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
+        composable(
+            AppRoutes.CategoryEdit,
+            arguments = listOf(navArgument("id") { type = NavType.LongType }),
+        ) { back ->
+            val id = back.arguments?.getLong("id")
+            CategoryEditScreen(
+                viewModelFactory = viewModelFactory,
+                categoryId = id,
+                onSaved = { navController.popBackStack() },
+                onBack = { navController.popBackStack() },
+                onSessionExpired = {
+                    navController.navigate(AppRoutes.Login) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
         composable(AppRoutes.Products) { Placeholder("Товары") { navController.popBackStack() } }
         composable(AppRoutes.ProductDetails) { Placeholder("Товар") { navController.popBackStack() } }
         composable(AppRoutes.ProductEdit) { Placeholder("Редактирование товара") { navController.popBackStack() } }

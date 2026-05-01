@@ -5,4 +5,6 @@ data class Category(
     val name: String,
     val description: String?,
     val isActive: Boolean,
+    val createdAt: String,
+    val updatedAt: String,
 )

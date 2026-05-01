@@ -11,12 +11,14 @@ fun AppScaffold(
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
+    floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
         modifier = modifier,
         topBar = topBar,
         snackbarHost = snackbarHost,
+        floatingActionButton = floatingActionButton,
         containerColor = MaterialTheme.colorScheme.background,
         content = content,
     )

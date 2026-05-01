@@ -9,6 +9,7 @@ import com.example.warehouse_accounting_app.domain.model.reports.LowStockReport
 import com.example.warehouse_accounting_app.domain.model.reports.OperationReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockSummaryReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockValueReport
+import com.example.warehouse_accounting_app.core.result.AppResult
 import com.example.warehouse_accounting_app.domain.repository.CategoryRepository
 import com.example.warehouse_accounting_app.domain.repository.ProductRepository
 import com.example.warehouse_accounting_app.domain.repository.ReportRepository
@@ -16,14 +17,20 @@ import com.example.warehouse_accounting_app.domain.repository.StockHistoryFilter
 import com.example.warehouse_accounting_app.domain.repository.StockRepository
 
 class StubCategoryRepository : CategoryRepository {
-    override suspend fun getCategories(): Result<List<Category>> = Result.success(emptyList())
-    override suspend fun createCategory(name: String, description: String?): Result<Category> =
-        Result.failure(UnsupportedOperationException("TODO: wire CategoryApi"))
+    override suspend fun getCategories(activeOnly: Boolean): AppResult<List<Category>> =
+        AppResult.Success(emptyList())
 
-    override suspend fun updateCategory(id: Long, name: String, description: String?, isActive: Boolean): Result<Category> =
-        Result.failure(UnsupportedOperationException("TODO"))
+    override suspend fun getCategoryById(id: Long): AppResult<Category> =
+        AppResult.Error("Not implemented")
 
-    override suspend fun deleteCategory(id: Long): Result<Unit> = Result.success(Unit)
+    override suspend fun createCategory(name: String, description: String?): AppResult<Category> =
+        AppResult.Error("Not implemented")
+
+    override suspend fun updateCategory(id: Long, name: String, description: String?, isActive: Boolean): AppResult<Category> =
+        AppResult.Error("Not implemented")
+
+    override suspend fun deleteCategory(id: Long): AppResult<Category> =
+        AppResult.Error("Not implemented")
 }
 
 class StubProductRepository : ProductRepository {

@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.warehouse_accounting_app.presentation.auth.login.LoginViewModel
 import com.example.warehouse_accounting_app.presentation.auth.register.RegisterViewModel
+import com.example.warehouse_accounting_app.presentation.categories.CategoryEditViewModel
+import com.example.warehouse_accounting_app.presentation.categories.CategoryListViewModel
 import com.example.warehouse_accounting_app.presentation.dashboard.DashboardViewModel
 import com.example.warehouse_accounting_app.presentation.profile.ProfileViewModel
 import com.example.warehouse_accounting_app.presentation.splash.SplashViewModel
@@ -34,6 +36,18 @@ class WarehouseViewModelFactory(
                     c.unblockUserUseCase,
                     c.changeUserRoleUseCase,
                     c.getCurrentUserUseCase,
+                ) as T
+            modelClass.isAssignableFrom(CategoryListViewModel::class.java) ->
+                CategoryListViewModel(
+                    c.getCategoriesUseCase,
+                    c.deleteCategoryUseCase,
+                    c.getCurrentUserUseCase,
+                ) as T
+            modelClass.isAssignableFrom(CategoryEditViewModel::class.java) ->
+                CategoryEditViewModel(
+                    c.getCategoryByIdUseCase,
+                    c.createCategoryUseCase,
+                    c.updateCategoryUseCase,
                 ) as T
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
         }
