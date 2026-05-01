@@ -15,9 +15,9 @@ import com.example.warehouse_accounting_app.presentation.reports.ReportsViewMode
 import com.example.warehouse_accounting_app.presentation.splash.SplashViewModel
 import com.example.warehouse_accounting_app.presentation.stock.InventoryViewModel
 import com.example.warehouse_accounting_app.presentation.stock.IssueViewModel
-import com.example.warehouse_accounting_app.presentation.stock.LowStockViewModel
+import com.example.warehouse_accounting_app.presentation.stock.balances.LowStockViewModel
+import com.example.warehouse_accounting_app.presentation.stock.balances.StockBalanceViewModel
 import com.example.warehouse_accounting_app.presentation.stock.ReceiptViewModel
-import com.example.warehouse_accounting_app.presentation.stock.StockBalanceViewModel
 import com.example.warehouse_accounting_app.presentation.stock.WriteOffViewModel
 import com.example.warehouse_accounting_app.presentation.users.UserListViewModel
 

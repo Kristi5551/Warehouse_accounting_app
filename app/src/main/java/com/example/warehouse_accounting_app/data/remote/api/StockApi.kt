@@ -9,6 +9,7 @@ import com.example.warehouse_accounting_app.data.remote.dto.request.CreateWriteO
 import com.example.warehouse_accounting_app.data.remote.dto.response.ErrorResponseDto
 import com.example.warehouse_accounting_app.data.remote.dto.response.StockBalanceResponseDto
 import com.example.warehouse_accounting_app.data.remote.dto.response.StockOperationResponseDto
+import com.example.warehouse_accounting_app.domain.model.StockStatus
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -19,19 +20,27 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
 import kotlinx.serialization.json.Json
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 class StockApi(private val client: HttpClient, private val json: Json) {
 
-    suspend fun getStockBalances(warehouseId: Long?): List<StockBalanceResponseDto> {
-        val url = AppConfig.url("api/stock/balances") + (warehouseId?.let { "?warehouseId=$it" } ?: "")
-        val r = client.get(url)
+    private fun enc(s: String) = URLEncoder.encode(s, StandardCharsets.UTF_8)
+
+    suspend fun getStockBalances(search: String?, categoryId: Long?, status: StockStatus?): List<StockBalanceResponseDto> {
+        val parts = buildList {
+            search?.takeIf { it.isNotBlank() }?.let { add("search=${enc(it.trim())}") }
+            categoryId?.let { add("categoryId=$it") }
+            status?.let { add("status=${it.name}") }
+        }
+        val qs = if (parts.isEmpty()) "" else "?" + parts.joinToString("&")
+        val r = client.get(AppConfig.url("api/stock/balances") + qs)
         if (!r.status.isSuccess()) throw parseError(r.status.value, r.bodyAsText())
         return r.body()
     }
 
-    suspend fun getLowStock(warehouseId: Long?): List<StockBalanceResponseDto> {
-        val url = AppConfig.url("api/stock/low") + (warehouseId?.let { "?warehouseId=$it" } ?: "")
-        val r = client.get(url)
+    suspend fun getLowStock(): List<StockBalanceResponseDto> {
+        val r = client.get(AppConfig.url("api/stock/low"))
         if (!r.status.isSuccess()) throw parseError(r.status.value, r.bodyAsText())
         return r.body()
     }

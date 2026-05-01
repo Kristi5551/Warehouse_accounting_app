@@ -13,20 +13,25 @@ import com.example.warehouse_accounting_app.data.remote.dto.request.CreateReceip
 import com.example.warehouse_accounting_app.data.remote.dto.request.CreateWriteOffRequestDto
 import com.example.warehouse_accounting_app.domain.model.StockBalance
 import com.example.warehouse_accounting_app.domain.model.StockOperation
+import com.example.warehouse_accounting_app.domain.model.StockStatus
 import com.example.warehouse_accounting_app.domain.repository.StockHistoryFilter
 import com.example.warehouse_accounting_app.domain.repository.StockRepository
 import java.io.IOException
 
 class StockRepositoryImpl(private val api: StockApi) : StockRepository {
 
-    override suspend fun getStockBalances(warehouseId: Long?): AppResult<List<StockBalance>> = try {
-        AppResult.Success(api.getStockBalances(warehouseId).map { it.toDomain() })
+    override suspend fun getStockBalances(
+        search: String?,
+        categoryId: Long?,
+        status: StockStatus?,
+    ): AppResult<List<StockBalance>> = try {
+        AppResult.Success(api.getStockBalances(search, categoryId, status).map { it.toDomain() })
     } catch (e: ApiException) { logApiException(e, "GET /api/stock/balances"); AppResult.Error(e.message ?: "Ошибка загрузки остатков", e)
     } catch (e: IOException) { logNetworkFailure(e, "GET /api/stock/balances"); AppResult.Error(connectivityMessage(e), e)
     } catch (e: Exception) { logNetworkFailure(e, "GET /api/stock/balances"); AppResult.Error("Ошибка загрузки остатков", e) }
 
-    override suspend fun getLowStock(warehouseId: Long?): AppResult<List<StockBalance>> = try {
-        AppResult.Success(api.getLowStock(warehouseId).map { it.toDomain() })
+    override suspend fun getLowStock(): AppResult<List<StockBalance>> = try {
+        AppResult.Success(api.getLowStock().map { it.toDomain() })
     } catch (e: ApiException) { logApiException(e, "GET /api/stock/low"); AppResult.Error(e.message ?: "Ошибка", e)
     } catch (e: IOException) { logNetworkFailure(e, "GET /api/stock/low"); AppResult.Error(connectivityMessage(e), e)
     } catch (e: Exception) { logNetworkFailure(e, "GET /api/stock/low"); AppResult.Error("Ошибка загрузки", e) }

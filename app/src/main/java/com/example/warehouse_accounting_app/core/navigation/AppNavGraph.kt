@@ -38,9 +38,9 @@ import com.example.warehouse_accounting_app.presentation.splash.SplashScreenCont
 import com.example.warehouse_accounting_app.presentation.splash.SplashViewModel
 import com.example.warehouse_accounting_app.presentation.stock.InventoryScreen
 import com.example.warehouse_accounting_app.presentation.stock.IssueScreen
-import com.example.warehouse_accounting_app.presentation.stock.LowStockScreen
+import com.example.warehouse_accounting_app.presentation.stock.balances.LowStockScreen
+import com.example.warehouse_accounting_app.presentation.stock.balances.StockBalanceScreen
 import com.example.warehouse_accounting_app.presentation.stock.ReceiptScreen
-import com.example.warehouse_accounting_app.presentation.stock.StockBalanceScreen
 import com.example.warehouse_accounting_app.presentation.stock.WriteOffScreen
 import com.example.warehouse_accounting_app.presentation.users.UserListScreen
 

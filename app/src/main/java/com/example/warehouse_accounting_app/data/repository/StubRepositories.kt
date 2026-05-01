@@ -6,6 +6,7 @@ import com.example.warehouse_accounting_app.domain.model.Product
 import com.example.warehouse_accounting_app.domain.model.StockBalance
 import com.example.warehouse_accounting_app.domain.model.StockOperation
 import com.example.warehouse_accounting_app.domain.model.StockOperationType
+import com.example.warehouse_accounting_app.domain.model.StockStatus
 import com.example.warehouse_accounting_app.domain.model.reports.LowStockReport
 import com.example.warehouse_accounting_app.domain.model.reports.OperationReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockSummaryReport
@@ -33,8 +34,8 @@ class StubProductRepository : ProductRepository {
 }
 
 class StubStockRepository : StockRepository {
-    override suspend fun getStockBalances(warehouseId: Long?): AppResult<List<StockBalance>> = AppResult.Success(emptyList())
-    override suspend fun getLowStock(warehouseId: Long?): AppResult<List<StockBalance>> = AppResult.Success(emptyList())
+    override suspend fun getStockBalances(search: String?, categoryId: Long?, status: StockStatus?): AppResult<List<StockBalance>> = AppResult.Success(emptyList())
+    override suspend fun getLowStock(): AppResult<List<StockBalance>> = AppResult.Success(emptyList())
     override suspend fun createReceipt(warehouseId: Long, productId: Long, quantity: Double, price: Double, supplier: String?, comment: String?): AppResult<Unit> = AppResult.Error("Not implemented")
     override suspend fun createIssue(warehouseId: Long, productId: Long, quantity: Double, reason: String?, comment: String?): AppResult<Unit> = AppResult.Error("Not implemented")
     override suspend fun createWriteOff(warehouseId: Long, productId: Long, quantity: Double, reason: String?, comment: String?): AppResult<Unit> = AppResult.Error("Not implemented")

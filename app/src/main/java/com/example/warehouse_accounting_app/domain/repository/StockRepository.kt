@@ -4,6 +4,7 @@ import com.example.warehouse_accounting_app.core.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.StockBalance
 import com.example.warehouse_accounting_app.domain.model.StockOperation
 import com.example.warehouse_accounting_app.domain.model.StockOperationType
+import com.example.warehouse_accounting_app.domain.model.StockStatus
 
 data class StockHistoryFilter(
     val operationType: StockOperationType? = null,
@@ -13,8 +14,13 @@ data class StockHistoryFilter(
 )
 
 interface StockRepository {
-    suspend fun getStockBalances(warehouseId: Long? = null): AppResult<List<StockBalance>>
-    suspend fun getLowStock(warehouseId: Long? = null): AppResult<List<StockBalance>>
+    suspend fun getStockBalances(
+        search: String? = null,
+        categoryId: Long? = null,
+        status: StockStatus? = null,
+    ): AppResult<List<StockBalance>>
+
+    suspend fun getLowStock(): AppResult<List<StockBalance>>
     suspend fun createReceipt(
         warehouseId: Long, productId: Long, quantity: Double, price: Double, supplier: String?, comment: String?,
     ): AppResult<Unit>
