@@ -58,36 +58,40 @@ class StockApi(private val client: HttpClient, private val json: Json) {
         return r.body()
     }
 
-    suspend fun createReceipt(request: CreateReceiptRequestDto) {
+    suspend fun createReceipt(request: CreateReceiptRequestDto): StockOperationResponseDto {
         val r = client.post(AppConfig.url("api/stock/receipt")) {
             headers.append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(request)
         }
         if (!r.status.isSuccess()) throw parseError(r.status.value, r.bodyAsText())
+        return r.body()
     }
 
-    suspend fun createIssue(request: CreateIssueRequestDto) {
+    suspend fun createIssue(request: CreateIssueRequestDto): StockOperationResponseDto {
         val r = client.post(AppConfig.url("api/stock/issue")) {
             headers.append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(request)
         }
         if (!r.status.isSuccess()) throw parseError(r.status.value, r.bodyAsText())
+        return r.body()
     }
 
-    suspend fun createWriteOff(request: CreateWriteOffRequestDto) {
+    suspend fun createWriteOff(request: CreateWriteOffRequestDto): StockOperationResponseDto {
         val r = client.post(AppConfig.url("api/stock/write-off")) {
             headers.append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(request)
         }
         if (!r.status.isSuccess()) throw parseError(r.status.value, r.bodyAsText())
+        return r.body()
     }
 
-    suspend fun createInventory(request: CreateInventoryRequestDto) {
+    suspend fun createInventory(request: CreateInventoryRequestDto): StockOperationResponseDto {
         val r = client.post(AppConfig.url("api/stock/inventory")) {
             headers.append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(request)
         }
         if (!r.status.isSuccess()) throw parseError(r.status.value, r.bodyAsText())
+        return r.body()
     }
 
     private fun parseError(code: Int, raw: String): ApiException {

@@ -1,10 +1,11 @@
 ﻿package com.example.warehouse_accounting_app.domain.usecase.stock
 
 import com.example.warehouse_accounting_app.core.result.AppResult
+import com.example.warehouse_accounting_app.domain.model.StockOperation
 import com.example.warehouse_accounting_app.domain.repository.StockRepository
 
 class CreateInventoryUseCase(private val repository: StockRepository) {
     suspend operator fun invoke(
         warehouseId: Long, productId: Long, actualQuantity: Double, comment: String?,
-    ): AppResult<Unit> = repository.createInventory(warehouseId, productId, actualQuantity, comment)
+    ): AppResult<StockOperation> = repository.createInventory(warehouseId, productId, actualQuantity, comment)
 }

@@ -22,16 +22,35 @@ interface StockRepository {
 
     suspend fun getLowStock(): AppResult<List<StockBalance>>
     suspend fun createReceipt(
-        warehouseId: Long, productId: Long, quantity: Double, price: Double, supplier: String?, comment: String?,
-    ): AppResult<Unit>
+        warehouseId: Long,
+        productId: Long,
+        quantity: Double,
+        price: Double,
+        supplier: String?,
+        comment: String?,
+    ): AppResult<StockOperation>
+
     suspend fun createIssue(
-        warehouseId: Long, productId: Long, quantity: Double, reason: String?, comment: String?,
-    ): AppResult<Unit>
+        warehouseId: Long,
+        productId: Long,
+        quantity: Double,
+        reason: String?,
+        comment: String?,
+    ): AppResult<StockOperation>
+
     suspend fun createWriteOff(
-        warehouseId: Long, productId: Long, quantity: Double, reason: String?, comment: String?,
-    ): AppResult<Unit>
+        warehouseId: Long,
+        productId: Long,
+        quantity: Double,
+        reason: String?,
+        comment: String?,
+    ): AppResult<StockOperation>
+
     suspend fun createInventory(
-        warehouseId: Long, productId: Long, actualQuantity: Double, comment: String?,
-    ): AppResult<Unit>
+        warehouseId: Long,
+        productId: Long,
+        actualQuantity: Double,
+        comment: String?,
+    ): AppResult<StockOperation>
     suspend fun getProductHistory(productId: Long, filter: StockHistoryFilter): AppResult<List<StockOperation>>
 }

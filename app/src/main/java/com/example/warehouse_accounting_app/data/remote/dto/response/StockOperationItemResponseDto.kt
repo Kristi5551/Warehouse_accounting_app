@@ -7,6 +7,8 @@ data class StockOperationItemResponseDto(
     val id: Long,
     val operationId: Long,
     val productId: Long,
+    val productArticle: String? = null,
+    val productName: String? = null,
     val quantity: String,
     val price: String? = null,
     val reason: String? = null,

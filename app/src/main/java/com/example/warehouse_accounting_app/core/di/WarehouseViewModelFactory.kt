@@ -13,12 +13,12 @@ import com.example.warehouse_accounting_app.presentation.products.ProductListVie
 import com.example.warehouse_accounting_app.presentation.profile.ProfileViewModel
 import com.example.warehouse_accounting_app.presentation.reports.ReportsViewModel
 import com.example.warehouse_accounting_app.presentation.splash.SplashViewModel
-import com.example.warehouse_accounting_app.presentation.stock.InventoryViewModel
-import com.example.warehouse_accounting_app.presentation.stock.IssueViewModel
+import com.example.warehouse_accounting_app.presentation.stock.inventory.InventoryViewModel
+import com.example.warehouse_accounting_app.presentation.stock.issue.IssueViewModel
 import com.example.warehouse_accounting_app.presentation.stock.balances.LowStockViewModel
 import com.example.warehouse_accounting_app.presentation.stock.balances.StockBalanceViewModel
-import com.example.warehouse_accounting_app.presentation.stock.ReceiptViewModel
-import com.example.warehouse_accounting_app.presentation.stock.WriteOffViewModel
+import com.example.warehouse_accounting_app.presentation.stock.receipt.ReceiptViewModel
+import com.example.warehouse_accounting_app.presentation.stock.writeoff.WriteOffViewModel
 import com.example.warehouse_accounting_app.presentation.users.UserListViewModel
 
 class WarehouseViewModelFactory(private val container: AppContainer) : ViewModelProvider.Factory {
@@ -41,7 +41,8 @@ class WarehouseViewModelFactory(private val container: AppContainer) : ViewModel
             modelClass.isAssignableFrom(ReceiptViewModel::class.java) -> ReceiptViewModel(c.createReceiptUseCase, c.getProductsUseCase) as T
             modelClass.isAssignableFrom(IssueViewModel::class.java) -> IssueViewModel(c.createIssueUseCase, c.getProductsUseCase) as T
             modelClass.isAssignableFrom(WriteOffViewModel::class.java) -> WriteOffViewModel(c.createWriteOffUseCase, c.getProductsUseCase) as T
-            modelClass.isAssignableFrom(InventoryViewModel::class.java) -> InventoryViewModel(c.createInventoryUseCase, c.getProductsUseCase) as T
+            modelClass.isAssignableFrom(InventoryViewModel::class.java) ->
+                InventoryViewModel(c.createInventoryUseCase, c.getProductsUseCase, c.getStockBalancesUseCase) as T
             modelClass.isAssignableFrom(OperationHistoryViewModel::class.java) -> OperationHistoryViewModel(c.getOperationsReportUseCase) as T
             modelClass.isAssignableFrom(ReportsViewModel::class.java) -> ReportsViewModel(c.getStockSummaryReportUseCase, c.getLowStockReportUseCase, c.getOperationsReportUseCase, c.getStockValueReportUseCase) as T
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")

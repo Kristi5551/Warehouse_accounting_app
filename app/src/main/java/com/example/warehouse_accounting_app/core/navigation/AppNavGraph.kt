@@ -36,12 +36,12 @@ import com.example.warehouse_accounting_app.presentation.reports.ReportsScreen
 import com.example.warehouse_accounting_app.presentation.splash.SplashDestination
 import com.example.warehouse_accounting_app.presentation.splash.SplashScreenContent
 import com.example.warehouse_accounting_app.presentation.splash.SplashViewModel
-import com.example.warehouse_accounting_app.presentation.stock.InventoryScreen
-import com.example.warehouse_accounting_app.presentation.stock.IssueScreen
+import com.example.warehouse_accounting_app.presentation.stock.inventory.InventoryScreen
+import com.example.warehouse_accounting_app.presentation.stock.issue.IssueScreen
 import com.example.warehouse_accounting_app.presentation.stock.balances.LowStockScreen
 import com.example.warehouse_accounting_app.presentation.stock.balances.StockBalanceScreen
-import com.example.warehouse_accounting_app.presentation.stock.ReceiptScreen
-import com.example.warehouse_accounting_app.presentation.stock.WriteOffScreen
+import com.example.warehouse_accounting_app.presentation.stock.receipt.ReceiptScreen
+import com.example.warehouse_accounting_app.presentation.stock.writeoff.WriteOffScreen
 import com.example.warehouse_accounting_app.presentation.users.UserListScreen
 
 private fun NavHostController.logout() {

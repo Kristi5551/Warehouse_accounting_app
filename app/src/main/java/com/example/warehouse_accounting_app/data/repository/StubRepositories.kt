@@ -36,10 +36,10 @@ class StubProductRepository : ProductRepository {
 class StubStockRepository : StockRepository {
     override suspend fun getStockBalances(search: String?, categoryId: Long?, status: StockStatus?): AppResult<List<StockBalance>> = AppResult.Success(emptyList())
     override suspend fun getLowStock(): AppResult<List<StockBalance>> = AppResult.Success(emptyList())
-    override suspend fun createReceipt(warehouseId: Long, productId: Long, quantity: Double, price: Double, supplier: String?, comment: String?): AppResult<Unit> = AppResult.Error("Not implemented")
-    override suspend fun createIssue(warehouseId: Long, productId: Long, quantity: Double, reason: String?, comment: String?): AppResult<Unit> = AppResult.Error("Not implemented")
-    override suspend fun createWriteOff(warehouseId: Long, productId: Long, quantity: Double, reason: String?, comment: String?): AppResult<Unit> = AppResult.Error("Not implemented")
-    override suspend fun createInventory(warehouseId: Long, productId: Long, actualQuantity: Double, comment: String?): AppResult<Unit> = AppResult.Error("Not implemented")
+    override suspend fun createReceipt(warehouseId: Long, productId: Long, quantity: Double, price: Double, supplier: String?, comment: String?): AppResult<StockOperation> = AppResult.Error("Not implemented")
+    override suspend fun createIssue(warehouseId: Long, productId: Long, quantity: Double, reason: String?, comment: String?): AppResult<StockOperation> = AppResult.Error("Not implemented")
+    override suspend fun createWriteOff(warehouseId: Long, productId: Long, quantity: Double, reason: String?, comment: String?): AppResult<StockOperation> = AppResult.Error("Not implemented")
+    override suspend fun createInventory(warehouseId: Long, productId: Long, actualQuantity: Double, comment: String?): AppResult<StockOperation> = AppResult.Error("Not implemented")
     override suspend fun getProductHistory(productId: Long, filter: StockHistoryFilter): AppResult<List<StockOperation>> = AppResult.Success(emptyList())
 }
 

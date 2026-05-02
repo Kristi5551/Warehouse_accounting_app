@@ -12,6 +12,7 @@ import com.example.warehouse_accounting_app.data.remote.dto.request.UpdateProduc
 import com.example.warehouse_accounting_app.domain.model.Product
 import com.example.warehouse_accounting_app.domain.repository.ProductRepository
 import java.io.IOException
+import java.util.Locale
 
 class ProductRepositoryImpl(private val api: ProductApi) : ProductRepository {
 
@@ -44,7 +45,9 @@ class ProductRepositoryImpl(private val api: ProductApi) : ProductRepository {
         try {
             AppResult.Success(api.createProduct(CreateProductRequestDto(
                 article, name, categoryId, unit,
-                "%.2f".format(purchasePrice), "%.2f".format(salePrice), "%.3f".format(minStock),
+                String.format(Locale.US, "%.2f", purchasePrice),
+                String.format(Locale.US, "%.2f", salePrice),
+                String.format(Locale.US, "%.3f", minStock),
             )).toDomain())
         } catch (e: ApiException) {
             logApiException(e, "POST /api/products"); AppResult.Error(e.message ?: "Ошибка создания товара", e)
@@ -61,7 +64,10 @@ class ProductRepositoryImpl(private val api: ProductApi) : ProductRepository {
         try {
             AppResult.Success(api.updateProduct(id, UpdateProductRequestDto(
                 article, name, categoryId, unit,
-                "%.2f".format(purchasePrice), "%.2f".format(salePrice), "%.3f".format(minStock), isActive,
+                String.format(Locale.US, "%.2f", purchasePrice),
+                String.format(Locale.US, "%.2f", salePrice),
+                String.format(Locale.US, "%.3f", minStock),
+                isActive,
             )).toDomain())
         } catch (e: ApiException) {
             logApiException(e, "PUT /api/products/$id"); AppResult.Error(e.message ?: "Ошибка обновления товара", e)
