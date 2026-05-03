@@ -13,4 +13,6 @@ data class OperationReportLine(
     val productName: String,
     val quantity: Double,
     val price: Double?,
+    /** Все позиции операции (как минимум одна; дубли операции в списке отчёта исключены). */
+    val items: List<OperationReportItemLine> = emptyList(),
 )

@@ -1,6 +1,7 @@
 package com.example.warehouse_accounting_app.data.mapper
 
 import com.example.warehouse_accounting_app.data.remote.dto.response.LowStockReportResponseDto
+import com.example.warehouse_accounting_app.data.remote.dto.response.OperationReportItemResponseDto
 import com.example.warehouse_accounting_app.data.remote.dto.response.OperationReportResponseDto
 import com.example.warehouse_accounting_app.data.remote.dto.response.OperationsReportBundleResponseDto
 import com.example.warehouse_accounting_app.data.remote.dto.response.StockSummaryReportResponseDto
@@ -8,6 +9,7 @@ import com.example.warehouse_accounting_app.data.remote.dto.response.StockValueI
 import com.example.warehouse_accounting_app.data.remote.dto.response.StockValueReportResponseDto
 import com.example.warehouse_accounting_app.domain.model.StockOperationType
 import com.example.warehouse_accounting_app.domain.model.reports.LowStockReport
+import com.example.warehouse_accounting_app.domain.model.reports.OperationReportItemLine
 import com.example.warehouse_accounting_app.domain.model.reports.OperationReportLine
 import com.example.warehouse_accounting_app.domain.model.reports.OperationsReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockSummaryReport
@@ -50,19 +52,42 @@ fun StockValueItemResponseDto.toDomain(): StockValueReportItem =
         value = value.toDoubleOrNull() ?: 0.0,
     )
 
-fun OperationReportResponseDto.toOperationLine(): OperationReportLine =
-    OperationReportLine(
+fun OperationReportItemResponseDto.toDomain(): OperationReportItemLine =
+    OperationReportItemLine(
+        productArticle = productArticle,
+        productName = productName,
+        quantity = quantity.toDoubleOrNull() ?: 0.0,
+        price = price?.toDoubleOrNull(),
+    )
+
+fun OperationReportResponseDto.toOperationLine(): OperationReportLine {
+    val mappedItems = items.map { it.toDomain() }
+    val effectiveItems =
+        mappedItems.ifEmpty {
+            listOf(
+                OperationReportItemLine(
+                    productArticle = productArticle,
+                    productName = productName,
+                    quantity = quantity.toDoubleOrNull() ?: 0.0,
+                    price = price?.toDoubleOrNull(),
+                ),
+            )
+        }
+    val first = effectiveItems.first()
+    return OperationReportLine(
         operationId = operationId,
         operationType = runCatching { StockOperationType.valueOf(operationType) }.getOrDefault(StockOperationType.RECEIPT),
         warehouseId = warehouseId,
         warehouseName = warehouseName,
         createdByName = createdByName,
         createdAt = createdAt,
-        productArticle = productArticle,
-        productName = productName,
-        quantity = quantity.toDoubleOrNull() ?: 0.0,
-        price = price?.toDoubleOrNull(),
+        productArticle = first.productArticle,
+        productName = first.productName,
+        quantity = first.quantity,
+        price = first.price,
+        items = effectiveItems,
     )
+}
 
 fun OperationsReportBundleResponseDto.toDomain(): OperationsReport =
     OperationsReport(

@@ -14,4 +14,5 @@ data class OperationReportResponseDto(
     val productName: String,
     val quantity: String,
     val price: String? = null,
+    val items: List<OperationReportItemResponseDto> = emptyList(),
 )

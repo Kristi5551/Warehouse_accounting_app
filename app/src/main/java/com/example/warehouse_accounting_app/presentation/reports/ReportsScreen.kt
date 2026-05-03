@@ -235,7 +235,10 @@ fun ReportsScreen(
                         }
                     }
 
-                    items(state.operationsReport?.operations?.take(25).orEmpty()) { line ->
+                    items(
+                        items = state.operationsReport?.operations?.take(25).orEmpty(),
+                        key = { it.operationId },
+                    ) { line ->
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
@@ -330,13 +333,27 @@ private fun LowStockCard(item: LowStockReport) {
 
 @Composable
 private fun OperationRow(line: OperationReportLine, modifier: Modifier = Modifier) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(line.operationType.ruLabel(), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
             Text(line.createdAt.take(16).replace("T", " "), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        Text("${line.productName} (${line.productArticle})", style = MaterialTheme.typography.bodySmall)
-        Text("Кол-во: ${formatQty(line.quantity)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (line.items.size <= 1) {
+            Text("${line.productName} (${line.productArticle})", style = MaterialTheme.typography.bodySmall)
+            Text("Кол-во: ${formatQty(line.quantity)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        } else {
+            line.items.forEach { item ->
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text("${item.productName} (${item.productArticle})", style = MaterialTheme.typography.bodySmall)
+                    val qtyPrice =
+                        buildString {
+                            append("Кол-во: ${formatQty(item.quantity)}")
+                            item.price?.let { append(" · Цена: ${formatMoneyRub(it)}") }
+                        }
+                    Text(qtyPrice, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
         Text("${line.warehouseName} · ${line.createdByName}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
