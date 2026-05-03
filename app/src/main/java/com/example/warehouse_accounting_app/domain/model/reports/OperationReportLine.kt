@@ -2,7 +2,7 @@ package com.example.warehouse_accounting_app.domain.model.reports
 
 import com.example.warehouse_accounting_app.domain.model.StockOperationType
 
-data class OperationReport(
+data class OperationReportLine(
     val operationId: Long,
     val operationType: StockOperationType,
     val warehouseId: Long,

@@ -5,10 +5,9 @@ import com.example.warehouse_accounting_app.domain.model.Category
 import com.example.warehouse_accounting_app.domain.model.Product
 import com.example.warehouse_accounting_app.domain.model.StockBalance
 import com.example.warehouse_accounting_app.domain.model.StockOperation
-import com.example.warehouse_accounting_app.domain.model.StockOperationType
 import com.example.warehouse_accounting_app.domain.model.StockStatus
 import com.example.warehouse_accounting_app.domain.model.reports.LowStockReport
-import com.example.warehouse_accounting_app.domain.model.reports.OperationReport
+import com.example.warehouse_accounting_app.domain.model.reports.OperationsReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockSummaryReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockValueReport
 import com.example.warehouse_accounting_app.domain.repository.CategoryRepository
@@ -49,8 +48,14 @@ class StubStockRepository : StockRepository {
 }
 
 class StubReportRepository : ReportRepository {
-    override suspend fun getStockSummary(warehouseId: Long?): AppResult<List<StockSummaryReport>> = AppResult.Success(emptyList())
+    override suspend fun getStockSummary(warehouseId: Long?): AppResult<StockSummaryReport> =
+        AppResult.Success(StockSummaryReport(0, 0, 0, 0, emptyList()))
+
     override suspend fun getLowStockReport(warehouseId: Long?): AppResult<List<LowStockReport>> = AppResult.Success(emptyList())
-    override suspend fun getOperationsReport(operationType: StockOperationType?, productId: Long?, from: String?, to: String?, userId: Long?): AppResult<List<OperationReport>> = AppResult.Success(emptyList())
-    override suspend fun getStockValueReport(warehouseId: Long?): AppResult<List<StockValueReport>> = AppResult.Success(emptyList())
+
+    override suspend fun getOperationsReport(dateFrom: String?, dateTo: String?): AppResult<OperationsReport> =
+        AppResult.Success(OperationsReport(emptyList(), 0, 0, 0, 0))
+
+    override suspend fun getStockValueReport(warehouseId: Long?): AppResult<StockValueReport> =
+        AppResult.Success(StockValueReport(0.0, emptyList()))
 }

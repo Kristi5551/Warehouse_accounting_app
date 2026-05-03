@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.warehouse_accounting_app.core.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.reports.LowStockReport
-import com.example.warehouse_accounting_app.domain.model.reports.OperationReport
+import com.example.warehouse_accounting_app.domain.model.reports.OperationsReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockSummaryReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockValueReport
 import com.example.warehouse_accounting_app.domain.usecase.report.GetLowStockReportUseCase
@@ -17,15 +17,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class ReportsState(
-    val isLoading: Boolean = false,
-    val stockSummary: List<StockSummaryReport> = emptyList(),
-    val lowStockReport: List<LowStockReport> = emptyList(),
-    val operationsReport: List<OperationReport> = emptyList(),
-    val stockValueReport: List<StockValueReport> = emptyList(),
-    val errorMessage: String? = null,
-)
-
 class ReportsViewModel(
     private val getStockSummaryUseCase: GetStockSummaryReportUseCase,
     private val getLowStockReportUseCase: GetLowStockReportUseCase,
@@ -35,39 +26,83 @@ class ReportsViewModel(
     private val _state = MutableStateFlow(ReportsState())
     val state = _state.asStateFlow()
 
-    init { load() }
+    init {
+        loadAll()
+    }
 
-    fun load() {
+    fun onEvent(event: ReportsEvent) {
+        when (event) {
+            ReportsEvent.RefreshAll -> loadAll()
+            is ReportsEvent.DateFromChanged -> _state.update { it.copy(dateFromInput = event.value) }
+            is ReportsEvent.DateToChanged -> _state.update { it.copy(dateToInput = event.value) }
+            ReportsEvent.ApplyOperationsPeriod -> loadOperationsOnly()
+        }
+    }
+
+    fun load() = onEvent(ReportsEvent.RefreshAll)
+
+    private fun loadAll() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
-
-            val summaryResult = async { getStockSummaryUseCase(null) }.await()
-            val lowResult = async { getLowStockReportUseCase(null) }.await()
-            val opsResult = async { getOperationsReportUseCase(null, null, null, null, null) }.await()
-            val valueResult = async { getStockValueReportUseCase(null) }.await()
-
-            val summary: List<StockSummaryReport> = if (summaryResult is AppResult.Success) summaryResult.data else emptyList()
-            val low: List<LowStockReport> = if (lowResult is AppResult.Success) lowResult.data else emptyList()
-            val ops: List<OperationReport> = if (opsResult is AppResult.Success) opsResult.data else emptyList()
-            val value: List<StockValueReport> = if (valueResult is AppResult.Success) valueResult.data else emptyList()
-
-            val firstError = listOfNotNull(
-                (summaryResult as? AppResult.Error)?.message,
-                (lowResult as? AppResult.Error)?.message,
-                (opsResult as? AppResult.Error)?.message,
-                (valueResult as? AppResult.Error)?.message,
-            ).firstOrNull()
-
-            _state.update {
-                it.copy(
-                    isLoading = false,
-                    stockSummary = summary,
-                    lowStockReport = low,
-                    operationsReport = ops,
-                    stockValueReport = value,
-                    errorMessage = firstError,
+            val s = _state.value
+            val summaryD = async { getStockSummaryUseCase(null) }
+            val lowD = async { getLowStockReportUseCase(null) }
+            val valueD = async { getStockValueReportUseCase(null) }
+            val opsD = async {
+                getOperationsReportUseCase(
+                    s.dateFromInput.trim().takeIf { it.isNotEmpty() },
+                    s.dateToInput.trim().takeIf { it.isNotEmpty() },
                 )
             }
+            mergeResults(summaryD.await(), lowD.await(), opsD.await(), valueD.await())
+        }
+    }
+
+    private fun loadOperationsOnly() {
+        viewModelScope.launch {
+            val s = _state.value
+            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            when (
+                val opsR =
+                    getOperationsReportUseCase(
+                        s.dateFromInput.trim().takeIf { it.isNotEmpty() },
+                        s.dateToInput.trim().takeIf { it.isNotEmpty() },
+                    )
+            ) {
+                is AppResult.Success ->
+                    _state.update { it.copy(isLoading = false, operationsReport = opsR.data, errorMessage = null) }
+                is AppResult.Error ->
+                    _state.update { it.copy(isLoading = false, errorMessage = opsR.message) }
+            }
+        }
+    }
+
+    private fun mergeResults(
+        summaryR: AppResult<StockSummaryReport>,
+        lowR: AppResult<List<LowStockReport>>,
+        opsR: AppResult<OperationsReport>,
+        valueR: AppResult<StockValueReport>,
+    ) {
+        val summary = if (summaryR is AppResult.Success) summaryR.data else null
+        val low = if (lowR is AppResult.Success) lowR.data else emptyList()
+        val ops = if (opsR is AppResult.Success) opsR.data else null
+        val value = if (valueR is AppResult.Success) valueR.data else null
+        val firstError =
+            listOfNotNull(
+                (summaryR as? AppResult.Error)?.message,
+                (lowR as? AppResult.Error)?.message,
+                (opsR as? AppResult.Error)?.message,
+                (valueR as? AppResult.Error)?.message,
+            ).firstOrNull()
+        _state.update {
+            it.copy(
+                isLoading = false,
+                stockSummary = summary,
+                lowStockReport = low,
+                operationsReport = ops,
+                stockValueReport = value,
+                errorMessage = firstError,
+            )
         }
     }
 }

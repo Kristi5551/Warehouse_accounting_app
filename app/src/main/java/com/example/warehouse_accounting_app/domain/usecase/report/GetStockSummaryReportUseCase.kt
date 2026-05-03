@@ -5,6 +5,6 @@ import com.example.warehouse_accounting_app.domain.model.reports.StockSummaryRep
 import com.example.warehouse_accounting_app.domain.repository.ReportRepository
 
 class GetStockSummaryReportUseCase(private val repository: ReportRepository) {
-    suspend operator fun invoke(warehouseId: Long?): AppResult<List<StockSummaryReport>> =
+    suspend operator fun invoke(warehouseId: Long? = null): AppResult<StockSummaryReport> =
         repository.getStockSummary(warehouseId)
 }

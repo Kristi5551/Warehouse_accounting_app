@@ -1,9 +1,11 @@
 package com.example.warehouse_accounting_app.core.navigation
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +34,7 @@ import com.example.warehouse_accounting_app.presentation.products.ProductDetails
 import com.example.warehouse_accounting_app.presentation.products.ProductEditScreen
 import com.example.warehouse_accounting_app.presentation.products.ProductListScreen
 import com.example.warehouse_accounting_app.presentation.profile.ProfileScreen
+import com.example.warehouse_accounting_app.presentation.reports.ReportsAccessViewModel
 import com.example.warehouse_accounting_app.presentation.reports.ReportsScreen
 import com.example.warehouse_accounting_app.presentation.splash.SplashDestination
 import com.example.warehouse_accounting_app.presentation.splash.SplashScreenContent
@@ -161,7 +164,21 @@ fun AppNavGraph(
             OperationHistoryScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
         }
         composable(AppRoutes.Reports) {
-            ReportsScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
+            val gate: ReportsAccessViewModel = viewModel(factory = viewModelFactory)
+            val access by gate.access.collectAsStateWithLifecycle()
+            when (access) {
+                ReportsAccessViewModel.AccessState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+                ReportsAccessViewModel.AccessState.Denied -> {
+                    LaunchedEffect(Unit) { navController.popBackStack() }
+                }
+                ReportsAccessViewModel.AccessState.Allowed -> {
+                    ReportsScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
+                }
+            }
         }
     }
 }

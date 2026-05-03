@@ -4,11 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class StockSummaryReportResponseDto(
-    val warehouseId: Long,
-    val warehouseName: String,
-    val productId: Long,
-    val productArticle: String,
-    val productName: String,
-    val quantity: String,
-    val unit: String,
+    val totalProducts: Int,
+    val inStockCount: Int,
+    val lowStockCount: Int,
+    val outOfStockCount: Int,
+    val balances: List<StockBalanceResponseDto> = emptyList(),
 )
