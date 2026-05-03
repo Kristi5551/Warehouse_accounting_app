@@ -51,6 +51,7 @@ import com.example.warehouse_accounting_app.domain.usecase.stock.GetStockBalance
 import com.example.warehouse_accounting_app.domain.usecase.user.ApproveUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.BlockUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.ChangeUserRoleUseCase
+import com.example.warehouse_accounting_app.domain.usecase.user.CreateAdminUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.GetPendingUsersUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.GetUsersForOperationFiltersUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.GetUsersUseCase
@@ -91,6 +92,7 @@ class AppContainer(context: Context) {
     val blockUserUseCase = BlockUserUseCase(userRepository)
     val unblockUserUseCase = UnblockUserUseCase(userRepository)
     val changeUserRoleUseCase = ChangeUserRoleUseCase(userRepository)
+    val createAdminUserUseCase = CreateAdminUserUseCase(userRepository)
     val getUsersForOperationFiltersUseCase = GetUsersForOperationFiltersUseCase(userRepository)
 
     // Categories

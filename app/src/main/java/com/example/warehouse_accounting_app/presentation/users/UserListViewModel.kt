@@ -9,6 +9,7 @@ import com.example.warehouse_accounting_app.domain.usecase.auth.GetCurrentUserUs
 import com.example.warehouse_accounting_app.domain.usecase.user.ApproveUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.BlockUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.ChangeUserRoleUseCase
+import com.example.warehouse_accounting_app.domain.usecase.user.CreateAdminUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.GetUsersUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.UnblockUserUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,7 @@ class UserListViewModel(
     private val blockUser: BlockUserUseCase,
     private val unblockUser: UnblockUserUseCase,
     private val changeUserRole: ChangeUserRoleUseCase,
+    private val createAdminUser: CreateAdminUserUseCase,
     private val getCurrentUser: GetCurrentUserUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(UserListState())
@@ -58,6 +60,80 @@ class UserListViewModel(
             }
             UserListEvent.ClearMessages -> _state.update { it.copy(errorMessage = null, successMessage = null) }
             UserListEvent.SessionExpiredConsumed -> _state.update { it.copy(sessionExpired = false) }
+            UserListEvent.OpenCreateAdminDialog ->
+                _state.update {
+                    it.copy(
+                        createAdminDialogVisible = true,
+                        createAdminFormError = null,
+                        newAdminFullName = "",
+                        newAdminEmail = "",
+                        newAdminPassword = "",
+                        newAdminRepeatPassword = "",
+                    )
+                }
+            UserListEvent.CloseCreateAdminDialog ->
+                _state.update {
+                    it.copy(
+                        createAdminDialogVisible = false,
+                        createAdminFormError = null,
+                    )
+                }
+            is UserListEvent.CreateAdminFullNameChanged ->
+                _state.update { s -> s.copy(newAdminFullName = event.value, createAdminFormError = null) }
+            is UserListEvent.CreateAdminEmailChanged ->
+                _state.update { s -> s.copy(newAdminEmail = event.value, createAdminFormError = null) }
+            is UserListEvent.CreateAdminPasswordChanged ->
+                _state.update { s -> s.copy(newAdminPassword = event.value, createAdminFormError = null) }
+            is UserListEvent.CreateAdminRepeatPasswordChanged ->
+                _state.update { s -> s.copy(newAdminRepeatPassword = event.value, createAdminFormError = null) }
+            UserListEvent.SubmitCreateAdmin -> submitCreateAdmin()
+        }
+    }
+
+    private fun submitCreateAdmin() {
+        viewModelScope.launch {
+            val s = _state.value
+            val err =
+                when {
+                    s.newAdminFullName.isBlank() -> "Укажите ФИО"
+                    s.newAdminEmail.isBlank() -> "Введите email"
+                    s.newAdminPassword.length < 6 -> "Пароль не короче 6 символов"
+                    s.newAdminPassword != s.newAdminRepeatPassword -> "Пароли не совпадают"
+                    else -> null
+                }
+            if (err != null) {
+                _state.update { it.copy(createAdminFormError = err) }
+                return@launch
+            }
+            _state.update {
+                it.copy(createAdminFormError = null, actionInProgress = true, errorMessage = null, successMessage = null)
+            }
+            when (val r = createAdminUser(s.newAdminFullName, s.newAdminEmail, s.newAdminPassword)) {
+                is AppResult.Success -> {
+                    _state.update {
+                        it.copy(
+                            actionInProgress = false,
+                            createAdminDialogVisible = false,
+                            newAdminFullName = "",
+                            newAdminEmail = "",
+                            newAdminPassword = "",
+                            newAdminRepeatPassword = "",
+                            successMessage = "Администратор создан и может войти в систему",
+                        )
+                    }
+                    load()
+                }
+                is AppResult.Error -> {
+                    val code = (r.throwable as? ApiException)?.statusCode
+                    _state.update {
+                        it.copy(
+                            actionInProgress = false,
+                            errorMessage = r.message,
+                            sessionExpired = code == 401,
+                        )
+                    }
+                }
+            }
         }
     }
 

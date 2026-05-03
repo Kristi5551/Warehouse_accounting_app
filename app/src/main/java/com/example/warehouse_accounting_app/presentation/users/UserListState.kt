@@ -27,4 +27,10 @@ data class UserListState(
     val sessionExpired: Boolean = false,
     val roleDialogUserId: Long? = null,
     val actionInProgress: Boolean = false,
+    val createAdminDialogVisible: Boolean = false,
+    val newAdminFullName: String = "",
+    val newAdminEmail: String = "",
+    val newAdminPassword: String = "",
+    val newAdminRepeatPassword: String = "",
+    val createAdminFormError: String? = null,
 )

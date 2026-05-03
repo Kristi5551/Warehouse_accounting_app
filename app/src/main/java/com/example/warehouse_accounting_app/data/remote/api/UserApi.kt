@@ -4,6 +4,7 @@ import com.example.warehouse_accounting_app.core.config.AppConfig
 import com.example.warehouse_accounting_app.core.network.ApiException
 import com.example.warehouse_accounting_app.data.remote.dto.request.ApproveUserRequestDto
 import com.example.warehouse_accounting_app.data.remote.dto.request.ChangeUserRoleRequestDto
+import com.example.warehouse_accounting_app.data.remote.dto.request.CreateAdminUserRequestDto
 import com.example.warehouse_accounting_app.data.remote.dto.response.ErrorResponseDto
 import com.example.warehouse_accounting_app.data.remote.dto.response.UserBriefResponseDto
 import com.example.warehouse_accounting_app.data.remote.dto.response.UserResponseDto
@@ -11,10 +12,12 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
+import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.json.Json
 
@@ -22,6 +25,15 @@ class UserApi(
     private val client: HttpClient,
     private val json: Json,
 ) {
+    suspend fun createAdmin(request: CreateAdminUserRequestDto): UserResponseDto {
+        val response =
+            client.post(AppConfig.url("api/users/admin")) {
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }
+        return parseUser(response)
+    }
+
     suspend fun getUsers(): List<UserResponseDto> {
         val response = client.get(AppConfig.url("api/users"))
         return parseList(response)

@@ -13,4 +13,12 @@ sealed interface UserListEvent {
     data class ConfirmRole(val userId: Long, val role: UserRole) : UserListEvent
     data object ClearMessages : UserListEvent
     data object SessionExpiredConsumed : UserListEvent
+
+    data object OpenCreateAdminDialog : UserListEvent
+    data object CloseCreateAdminDialog : UserListEvent
+    data class CreateAdminFullNameChanged(val value: String) : UserListEvent
+    data class CreateAdminEmailChanged(val value: String) : UserListEvent
+    data class CreateAdminPasswordChanged(val value: String) : UserListEvent
+    data class CreateAdminRepeatPasswordChanged(val value: String) : UserListEvent
+    data object SubmitCreateAdmin : UserListEvent
 }

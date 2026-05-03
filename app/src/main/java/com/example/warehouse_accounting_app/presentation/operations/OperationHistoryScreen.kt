@@ -15,8 +15,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FactCheck
 import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.FactCheck
 import androidx.compose.material.icons.filled.MoveToInbox
 import androidx.compose.material.icons.filled.Output
 import androidx.compose.material.icons.filled.Refresh
@@ -54,6 +54,7 @@ import com.example.warehouse_accounting_app.core.ui.components.AppTopBar
 import com.example.warehouse_accounting_app.core.ui.components.EmptyContent
 import com.example.warehouse_accounting_app.core.ui.components.ErrorContent
 import com.example.warehouse_accounting_app.core.ui.components.LoadingContent
+import com.example.warehouse_accounting_app.core.ui.format.ruLabel
 import com.example.warehouse_accounting_app.domain.model.Product
 import com.example.warehouse_accounting_app.domain.model.StockOperation
 import com.example.warehouse_accounting_app.domain.model.StockOperationItem
@@ -367,14 +368,6 @@ private fun OperationTypeChip(type: StockOperationType) {
     }
 }
 
-private fun StockOperationType.ruLabel(): String =
-    when (this) {
-        StockOperationType.RECEIPT -> "Приход"
-        StockOperationType.ISSUE -> "Расход"
-        StockOperationType.WRITE_OFF -> "Списание"
-        StockOperationType.INVENTORY -> "Инвентаризация"
-    }
-
 private fun StockOperationType.accentColor(): Color =
     when (this) {
         StockOperationType.RECEIPT -> Color(0xFF198754)
@@ -388,7 +381,7 @@ private fun StockOperationType.iconAndColor(): Pair<ImageVector, Color> =
         StockOperationType.RECEIPT -> Icons.Filled.MoveToInbox to Color(0xFF198754)
         StockOperationType.ISSUE -> Icons.Filled.Output to Color(0xFFE67E22)
         StockOperationType.WRITE_OFF -> Icons.Filled.DeleteForever to Color(0xFFDC3545)
-        StockOperationType.INVENTORY -> Icons.Filled.FactCheck to Color(0xFF0D6EFD)
+        StockOperationType.INVENTORY -> Icons.AutoMirrored.Filled.FactCheck to Color(0xFF0D6EFD)
     }
 
 private fun formatOperationDate(iso: String): String {

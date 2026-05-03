@@ -12,6 +12,7 @@ interface UserRepository {
     suspend fun blockUser(id: Long): AppResult<User>
     suspend fun unblockUser(id: Long): AppResult<User>
     suspend fun changeUserRole(id: Long, role: UserRole): AppResult<User>
+    suspend fun createAdmin(fullName: String, email: String, password: String): AppResult<User>
 
     suspend fun getUsersForOperationFilters(): AppResult<List<UserPick>>
 }

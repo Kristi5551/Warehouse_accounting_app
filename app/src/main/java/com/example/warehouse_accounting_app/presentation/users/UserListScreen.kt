@@ -11,8 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -38,8 +41,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
 import com.example.warehouse_accounting_app.core.ui.components.AppButton
 import com.example.warehouse_accounting_app.core.ui.components.AppOutlinedButton
+import com.example.warehouse_accounting_app.core.ui.components.AppPasswordTextField
 import com.example.warehouse_accounting_app.core.ui.components.AppScaffold
 import com.example.warehouse_accounting_app.core.ui.components.AppSnackbarHost
+import com.example.warehouse_accounting_app.core.ui.components.AppTextField
 import com.example.warehouse_accounting_app.core.ui.components.AppTopBar
 import com.example.warehouse_accounting_app.core.ui.components.EmptyContent
 import com.example.warehouse_accounting_app.core.ui.components.ErrorContent
@@ -79,6 +84,12 @@ fun UserListScreen(
                 title = "Пользователи",
                 onBack = onBack,
                 actions = {
+                    IconButton(
+                        onClick = { viewModel.onEvent(UserListEvent.OpenCreateAdminDialog) },
+                        enabled = !state.isLoading && !state.actionInProgress,
+                    ) {
+                        Icon(Icons.Filled.PersonAdd, contentDescription = "Добавить администратора", tint = Color.White)
+                    }
                     IconButton(
                         onClick = { viewModel.onEvent(UserListEvent.Refresh) },
                         enabled = !state.isLoading && !state.actionInProgress,
@@ -156,6 +167,70 @@ fun UserListScreen(
                 TextButton(onClick = { viewModel.onEvent(UserListEvent.CloseRoleDialog) }) {
                     Text("Закрыть")
                 }
+            },
+        )
+    }
+
+    if (state.createAdminDialogVisible) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!state.actionInProgress) viewModel.onEvent(UserListEvent.CloseCreateAdminDialog)
+            },
+            title = { Text("Новый администратор") },
+            text = {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = "Будет создана активная учётная запись с полными правами администратора.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    AppTextField(
+                        value = state.newAdminFullName,
+                        onValueChange = { viewModel.onEvent(UserListEvent.CreateAdminFullNameChanged(it)) },
+                        label = "ФИО",
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    AppTextField(
+                        value = state.newAdminEmail,
+                        onValueChange = { viewModel.onEvent(UserListEvent.CreateAdminEmailChanged(it)) },
+                        label = "Email",
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    AppPasswordTextField(
+                        value = state.newAdminPassword,
+                        onValueChange = { viewModel.onEvent(UserListEvent.CreateAdminPasswordChanged(it)) },
+                        label = "Пароль",
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    AppPasswordTextField(
+                        value = state.newAdminRepeatPassword,
+                        onValueChange = { viewModel.onEvent(UserListEvent.CreateAdminRepeatPasswordChanged(it)) },
+                        label = "Повторите пароль",
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    state.createAdminFormError?.let { err ->
+                        Text(
+                            text = err,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { viewModel.onEvent(UserListEvent.SubmitCreateAdmin) },
+                    enabled = !state.actionInProgress,
+                ) { Text("Создать") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { viewModel.onEvent(UserListEvent.CloseCreateAdminDialog) },
+                    enabled = !state.actionInProgress,
+                ) { Text("Отмена") }
             },
         )
     }

@@ -11,18 +11,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FactCheck
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.FactCheck
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Inventory
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.MoveToInbox
 import androidx.compose.material.icons.filled.Output
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material.icons.filled.Warehouse
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -89,7 +89,7 @@ fun DashboardScreen(
                 title = "Складской учёт",
                 actions = {
                     IconButton(onClick = { showLogoutDialog = true }) {
-                        Icon(Icons.Filled.Logout, contentDescription = "Выйти", tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Выйти", tint = Color.White)
                     }
                 },
             )
@@ -180,11 +180,11 @@ private fun buildSections(role: UserRole): List<DashboardSection> = buildList {
             add(DashboardSection(AppRoutes.Categories, "Категории", "Группы товаров для удобного учёта", Icons.Filled.Category))
             add(DashboardSection(AppRoutes.Products, "Товары", "Каталог товаров торговой компании", Icons.Filled.Inventory))
             add(DashboardSection(AppRoutes.StockBalances, "Остатки", "Текущее количество товаров на складе", Icons.Filled.Warehouse))
-            add(DashboardSection(AppRoutes.LowStock, "Низкие остатки", "Товары, которые нужно пополнить", Icons.Filled.TrendingDown))
+            add(DashboardSection(AppRoutes.LowStock, "Низкие остатки", "Товары, которые нужно пополнить", Icons.AutoMirrored.Filled.TrendingDown))
             add(DashboardSection(AppRoutes.Receipt, "Приход", "Поступление товаров на склад", Icons.Filled.MoveToInbox))
             add(DashboardSection(AppRoutes.Issue, "Расход", "Выдача или продажа товаров", Icons.Filled.Output))
             add(DashboardSection(AppRoutes.WriteOff, "Списание", "Учёт брака, потерь и повреждений", Icons.Filled.DeleteForever))
-            add(DashboardSection(AppRoutes.Inventory, "Инвентаризация", "Сверка учётного и фактического количества", Icons.Filled.FactCheck))
+            add(DashboardSection(AppRoutes.Inventory, "Инвентаризация", "Сверка учётного и фактического количества", Icons.AutoMirrored.Filled.FactCheck))
             add(DashboardSection(AppRoutes.OperationHistory, "История", "Все движения товаров на складе", Icons.Filled.History))
             add(DashboardSection(AppRoutes.Reports, "Отчёты", "Аналитика по остаткам и движениям товаров", Icons.Filled.BarChart))
             add(DashboardSection(AppRoutes.Profile, "Профиль", "Данные учётной записи и выход", Icons.Filled.Person))
@@ -196,7 +196,7 @@ private fun buildSections(role: UserRole): List<DashboardSection> = buildList {
             add(DashboardSection(AppRoutes.Receipt, "Приход", "Поступление товаров на склад", Icons.Filled.MoveToInbox))
             add(DashboardSection(AppRoutes.Issue, "Расход", "Выдача или продажа товаров", Icons.Filled.Output))
             add(DashboardSection(AppRoutes.WriteOff, "Списание", "Учёт брака и потерь", Icons.Filled.DeleteForever))
-            add(DashboardSection(AppRoutes.Inventory, "Инвентаризация", "Сверка остатков", Icons.Filled.FactCheck))
+            add(DashboardSection(AppRoutes.Inventory, "Инвентаризация", "Сверка остатков", Icons.AutoMirrored.Filled.FactCheck))
             add(DashboardSection(AppRoutes.OperationHistory, "История", "Все движения товаров", Icons.Filled.History))
             add(DashboardSection(AppRoutes.Profile, "Профиль", "Данные учётной записи", Icons.Filled.Person))
         }
@@ -204,7 +204,7 @@ private fun buildSections(role: UserRole): List<DashboardSection> = buildList {
             add(DashboardSection(AppRoutes.Categories, "Категории", "Группы товаров", Icons.Filled.Category))
             add(DashboardSection(AppRoutes.Products, "Товары", "Каталог товаров", Icons.Filled.Inventory))
             add(DashboardSection(AppRoutes.StockBalances, "Остатки", "Текущее количество товаров", Icons.Filled.Warehouse))
-            add(DashboardSection(AppRoutes.LowStock, "Низкие остатки", "Товары для пополнения", Icons.Filled.TrendingDown))
+            add(DashboardSection(AppRoutes.LowStock, "Низкие остатки", "Товары для пополнения", Icons.AutoMirrored.Filled.TrendingDown))
             add(DashboardSection(AppRoutes.OperationHistory, "История", "Все движения товаров", Icons.Filled.History))
             add(DashboardSection(AppRoutes.Reports, "Отчёты", "Аналитика по складу", Icons.Filled.BarChart))
             add(DashboardSection(AppRoutes.Profile, "Профиль", "Данные учётной записи", Icons.Filled.Person))

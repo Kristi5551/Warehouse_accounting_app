@@ -40,7 +40,7 @@ import com.example.warehouse_accounting_app.core.ui.components.AppScaffold
 import com.example.warehouse_accounting_app.core.ui.components.AppTopBar
 import com.example.warehouse_accounting_app.core.ui.components.ErrorContent
 import com.example.warehouse_accounting_app.core.ui.components.LoadingContent
-import com.example.warehouse_accounting_app.domain.model.StockOperationType
+import com.example.warehouse_accounting_app.core.ui.format.ruLabel
 import com.example.warehouse_accounting_app.domain.model.reports.LowStockReport
 import com.example.warehouse_accounting_app.domain.model.reports.OperationReportLine
 import com.example.warehouse_accounting_app.domain.model.reports.StockValueReportItem
@@ -344,14 +344,6 @@ private fun OperationRow(line: OperationReportLine, modifier: Modifier = Modifie
 private fun EmptyHint(text: String) {
     Text(text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 4.dp))
 }
-
-private fun StockOperationType.ruLabel(): String =
-    when (this) {
-        StockOperationType.RECEIPT -> "Приход"
-        StockOperationType.ISSUE -> "Расход"
-        StockOperationType.WRITE_OFF -> "Списание"
-        StockOperationType.INVENTORY -> "Инвентаризация"
-    }
 
 private fun formatMoneyRub(v: Double): String =
     String.format(Locale.US, "%,.2f", v).replace(',', ' ') + " ₽"

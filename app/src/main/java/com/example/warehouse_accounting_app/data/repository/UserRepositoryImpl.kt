@@ -9,6 +9,7 @@ import com.example.warehouse_accounting_app.core.result.AppResult
 import com.example.warehouse_accounting_app.data.mapper.toDomain
 import com.example.warehouse_accounting_app.data.mapper.toUserPick
 import com.example.warehouse_accounting_app.data.remote.api.UserApi
+import com.example.warehouse_accounting_app.data.remote.dto.request.CreateAdminUserRequestDto
 import com.example.warehouse_accounting_app.domain.model.User
 import com.example.warehouse_accounting_app.domain.model.UserPick
 import com.example.warehouse_accounting_app.domain.model.UserRole
@@ -114,6 +115,21 @@ class UserRepositoryImpl(
         } catch (e: Exception) {
             logNetworkFailure(e, "PATCH /api/users/$id/role")
             AppResult.Error("Не удалось изменить роль", e)
+        }
+
+    override suspend fun createAdmin(fullName: String, email: String, password: String): AppResult<User> =
+        try {
+            AppResult.Success(api.createAdmin(CreateAdminUserRequestDto(fullName, email, password)).toDomain())
+        } catch (e: ApiException) {
+            logApiException(e, "POST /api/users/admin")
+            handleUnauthorized(e)
+            AppResult.Error(e.message ?: "Не удалось создать администратора", e)
+        } catch (e: IOException) {
+            logNetworkFailure(e, "POST /api/users/admin")
+            AppResult.Error(connectivityMessage(e), e)
+        } catch (e: Exception) {
+            logNetworkFailure(e, "POST /api/users/admin")
+            AppResult.Error("Не удалось создать администратора", e)
         }
 
     override suspend fun getUsersForOperationFilters(): AppResult<List<UserPick>> =

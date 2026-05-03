@@ -32,7 +32,16 @@ class WarehouseViewModelFactory(private val container: AppContainer) : ViewModel
             modelClass.isAssignableFrom(RegisterViewModel::class.java) -> RegisterViewModel(c.registerUseCase) as T
             modelClass.isAssignableFrom(DashboardViewModel::class.java) -> DashboardViewModel(c.logoutUseCase, c.getCurrentUserUseCase) as T
             modelClass.isAssignableFrom(ProfileViewModel::class.java) -> ProfileViewModel(c.getCurrentUserUseCase, c.logoutUseCase) as T
-            modelClass.isAssignableFrom(UserListViewModel::class.java) -> UserListViewModel(c.getUsersUseCase, c.approveUserUseCase, c.blockUserUseCase, c.unblockUserUseCase, c.changeUserRoleUseCase, c.getCurrentUserUseCase) as T
+            modelClass.isAssignableFrom(UserListViewModel::class.java) ->
+                UserListViewModel(
+                    c.getUsersUseCase,
+                    c.approveUserUseCase,
+                    c.blockUserUseCase,
+                    c.unblockUserUseCase,
+                    c.changeUserRoleUseCase,
+                    c.createAdminUserUseCase,
+                    c.getCurrentUserUseCase,
+                ) as T
             modelClass.isAssignableFrom(CategoryListViewModel::class.java) -> CategoryListViewModel(c.getCategoriesUseCase, c.deleteCategoryUseCase, c.getCurrentUserUseCase) as T
             modelClass.isAssignableFrom(CategoryEditViewModel::class.java) -> CategoryEditViewModel(c.getCategoryByIdUseCase, c.createCategoryUseCase, c.updateCategoryUseCase) as T
             modelClass.isAssignableFrom(ProductListViewModel::class.java) -> ProductListViewModel(c.getProductsUseCase, c.deleteProductUseCase, c.getCurrentUserUseCase, c.getCategoriesUseCase) as T
