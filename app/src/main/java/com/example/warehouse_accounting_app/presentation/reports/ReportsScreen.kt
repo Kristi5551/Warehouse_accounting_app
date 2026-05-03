@@ -336,6 +336,7 @@ private fun OperationRow(line: OperationReportLine, modifier: Modifier = Modifie
             Text(line.createdAt.take(16).replace("T", " "), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Text("${line.productName} (${line.productArticle})", style = MaterialTheme.typography.bodySmall)
+        Text("Кол-во: ${formatQty(line.quantity)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text("${line.warehouseName} · ${line.createdByName}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

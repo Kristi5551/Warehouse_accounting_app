@@ -1,5 +1,10 @@
 package com.example.warehouse_accounting_app.domain.model
 
+/**
+ * Строка складской операции.
+ *
+ * [quantity] > 0 — величина; направление задаёт тип операции ([StockOperation.operationType]).
+ */
 data class StockOperationItem(
     val id: Long,
     val operationId: Long,
