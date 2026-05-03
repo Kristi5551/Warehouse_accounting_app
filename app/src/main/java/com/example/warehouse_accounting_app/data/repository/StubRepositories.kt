@@ -12,6 +12,7 @@ import com.example.warehouse_accounting_app.domain.model.reports.OperationReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockSummaryReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockValueReport
 import com.example.warehouse_accounting_app.domain.repository.CategoryRepository
+import com.example.warehouse_accounting_app.domain.repository.OperationsFilter
 import com.example.warehouse_accounting_app.domain.repository.ProductRepository
 import com.example.warehouse_accounting_app.domain.repository.ReportRepository
 import com.example.warehouse_accounting_app.domain.repository.StockHistoryFilter
@@ -40,7 +41,11 @@ class StubStockRepository : StockRepository {
     override suspend fun createIssue(warehouseId: Long, productId: Long, quantity: Double, reason: String?, comment: String?): AppResult<StockOperation> = AppResult.Error("Not implemented")
     override suspend fun createWriteOff(warehouseId: Long, productId: Long, quantity: Double, reason: String?, comment: String?): AppResult<StockOperation> = AppResult.Error("Not implemented")
     override suspend fun createInventory(warehouseId: Long, productId: Long, actualQuantity: Double, comment: String?): AppResult<StockOperation> = AppResult.Error("Not implemented")
-    override suspend fun getProductHistory(productId: Long, filter: StockHistoryFilter): AppResult<List<StockOperation>> = AppResult.Success(emptyList())
+    override suspend fun getOperations(filter: OperationsFilter): AppResult<List<StockOperation>> =
+        AppResult.Success(emptyList())
+
+    override suspend fun getProductHistory(productId: Long, filter: StockHistoryFilter): AppResult<List<StockOperation>> =
+        AppResult.Success(emptyList())
 }
 
 class StubReportRepository : ReportRepository {

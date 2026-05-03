@@ -43,7 +43,12 @@ class WarehouseViewModelFactory(private val container: AppContainer) : ViewModel
             modelClass.isAssignableFrom(WriteOffViewModel::class.java) -> WriteOffViewModel(c.createWriteOffUseCase, c.getProductsUseCase) as T
             modelClass.isAssignableFrom(InventoryViewModel::class.java) ->
                 InventoryViewModel(c.createInventoryUseCase, c.getProductsUseCase, c.getStockBalancesUseCase) as T
-            modelClass.isAssignableFrom(OperationHistoryViewModel::class.java) -> OperationHistoryViewModel(c.getOperationsReportUseCase) as T
+            modelClass.isAssignableFrom(OperationHistoryViewModel::class.java) ->
+                OperationHistoryViewModel(
+                    c.getOperationHistoryUseCase,
+                    c.getProductsUseCase,
+                    c.getUsersForOperationFiltersUseCase,
+                ) as T
             modelClass.isAssignableFrom(ReportsViewModel::class.java) -> ReportsViewModel(c.getStockSummaryReportUseCase, c.getLowStockReportUseCase, c.getOperationsReportUseCase, c.getStockValueReportUseCase) as T
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
         }

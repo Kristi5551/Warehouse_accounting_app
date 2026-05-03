@@ -6,11 +6,19 @@ import com.example.warehouse_accounting_app.domain.model.StockOperation
 import com.example.warehouse_accounting_app.domain.model.StockOperationType
 import com.example.warehouse_accounting_app.domain.model.StockStatus
 
+data class OperationsFilter(
+    val type: StockOperationType? = null,
+    val productId: Long? = null,
+    val userId: Long? = null,
+    val dateFrom: String? = null,
+    val dateTo: String? = null,
+)
+
 data class StockHistoryFilter(
     val operationType: StockOperationType? = null,
-    val from: String? = null,
-    val to: String? = null,
     val userId: Long? = null,
+    val dateFrom: String? = null,
+    val dateTo: String? = null,
 )
 
 interface StockRepository {
@@ -52,5 +60,7 @@ interface StockRepository {
         actualQuantity: Double,
         comment: String?,
     ): AppResult<StockOperation>
+    suspend fun getOperations(filter: OperationsFilter): AppResult<List<StockOperation>>
+
     suspend fun getProductHistory(productId: Long, filter: StockHistoryFilter): AppResult<List<StockOperation>>
 }

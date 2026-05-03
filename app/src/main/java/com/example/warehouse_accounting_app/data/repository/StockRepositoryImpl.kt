@@ -15,6 +15,7 @@ import com.example.warehouse_accounting_app.domain.model.StockBalance
 import com.example.warehouse_accounting_app.domain.model.StockOperation
 import com.example.warehouse_accounting_app.domain.model.StockStatus
 import com.example.warehouse_accounting_app.domain.repository.StockHistoryFilter
+import com.example.warehouse_accounting_app.domain.repository.OperationsFilter
 import com.example.warehouse_accounting_app.domain.repository.StockRepository
 import java.io.IOException
 import java.util.Locale
@@ -80,8 +81,30 @@ class StockRepositoryImpl(private val api: StockApi) : StockRepository {
     } catch (e: IOException) { logNetworkFailure(e, "POST /api/stock/inventory"); AppResult.Error(connectivityMessage(e), e)
     } catch (e: Exception) { logNetworkFailure(e, "POST /api/stock/inventory"); AppResult.Error("Ошибка инвентаризации", e) }
 
+    override suspend fun getOperations(filter: OperationsFilter): AppResult<List<StockOperation>> = try {
+        AppResult.Success(
+            api.getOperations(
+                filter.type?.name,
+                filter.productId,
+                filter.userId,
+                filter.dateFrom,
+                filter.dateTo,
+            ).map { it.toDomain() },
+        )
+    } catch (e: ApiException) { logApiException(e, "GET /api/operations"); AppResult.Error(e.message ?: "Ошибка загрузки истории", e)
+    } catch (e: IOException) { logNetworkFailure(e, "GET /api/operations"); AppResult.Error(connectivityMessage(e), e)
+    } catch (e: Exception) { logNetworkFailure(e, "GET /api/operations"); AppResult.Error("Ошибка загрузки истории", e) }
+
     override suspend fun getProductHistory(productId: Long, filter: StockHistoryFilter): AppResult<List<StockOperation>> = try {
-        AppResult.Success(api.getProductHistory(productId, filter.operationType?.name, filter.from, filter.to, filter.userId).map { it.toDomain() })
+        AppResult.Success(
+            api.getProductHistory(
+                productId,
+                filter.operationType?.name,
+                filter.userId,
+                filter.dateFrom,
+                filter.dateTo,
+            ).map { it.toDomain() },
+        )
     } catch (e: ApiException) { logApiException(e, "GET /api/stock/products/$productId/history"); AppResult.Error(e.message ?: "Ошибка", e)
     } catch (e: IOException) { logNetworkFailure(e, "GET /api/stock/products/$productId/history"); AppResult.Error(connectivityMessage(e), e)
     } catch (e: Exception) { logNetworkFailure(e, "GET /api/stock/products/$productId/history"); AppResult.Error("Ошибка загрузки истории", e) }

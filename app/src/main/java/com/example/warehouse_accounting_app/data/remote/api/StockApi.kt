@@ -45,12 +45,38 @@ class StockApi(private val client: HttpClient, private val json: Json) {
         return r.body()
     }
 
-    suspend fun getProductHistory(productId: Long, operationType: String?, from: String?, to: String?, userId: Long?): List<StockOperationResponseDto> {
+    suspend fun getOperations(
+        type: String?,
+        productId: Long?,
+        userId: Long?,
+        dateFrom: String?,
+        dateTo: String?,
+    ): List<StockOperationResponseDto> {
+        val parts = buildList {
+            type?.let { add("type=${enc(it)}") }
+            productId?.let { add("productId=$it") }
+            userId?.let { add("userId=$it") }
+            dateFrom?.takeIf { it.isNotBlank() }?.let { add("dateFrom=${enc(it.trim())}") }
+            dateTo?.takeIf { it.isNotBlank() }?.let { add("dateTo=${enc(it.trim())}") }
+        }
+        val qs = if (parts.isEmpty()) "" else "?" + parts.joinToString("&")
+        val r = client.get(AppConfig.url("api/operations") + qs)
+        if (!r.status.isSuccess()) throw parseError(r.status.value, r.bodyAsText())
+        return r.body()
+    }
+
+    suspend fun getProductHistory(
+        productId: Long,
+        operationType: String?,
+        userId: Long?,
+        dateFrom: String?,
+        dateTo: String?,
+    ): List<StockOperationResponseDto> {
         val params = buildList {
-            if (operationType != null) add("operationType=$operationType")
-            if (from != null) add("from=$from")
-            if (to != null) add("to=$to")
+            if (operationType != null) add("type=${enc(operationType)}")
             if (userId != null) add("userId=$userId")
+            dateFrom?.takeIf { it.isNotBlank() }?.let { add("dateFrom=${enc(it.trim())}") }
+            dateTo?.takeIf { it.isNotBlank() }?.let { add("dateTo=${enc(it.trim())}") }
         }.joinToString("&")
         val url = AppConfig.url("api/stock/products/$productId/history") + if (params.isNotEmpty()) "?$params" else ""
         val r = client.get(url)

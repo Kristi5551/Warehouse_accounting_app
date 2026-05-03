@@ -45,12 +45,14 @@ import com.example.warehouse_accounting_app.domain.usecase.stock.CreateIssueUseC
 import com.example.warehouse_accounting_app.domain.usecase.stock.CreateReceiptUseCase
 import com.example.warehouse_accounting_app.domain.usecase.stock.CreateWriteOffUseCase
 import com.example.warehouse_accounting_app.domain.usecase.stock.GetLowStockUseCase
+import com.example.warehouse_accounting_app.domain.usecase.stock.GetOperationHistoryUseCase
 import com.example.warehouse_accounting_app.domain.usecase.stock.GetProductHistoryUseCase
 import com.example.warehouse_accounting_app.domain.usecase.stock.GetStockBalancesUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.ApproveUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.BlockUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.ChangeUserRoleUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.GetPendingUsersUseCase
+import com.example.warehouse_accounting_app.domain.usecase.user.GetUsersForOperationFiltersUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.GetUsersUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.UnblockUserUseCase
 import kotlinx.serialization.json.Json
@@ -89,6 +91,7 @@ class AppContainer(context: Context) {
     val blockUserUseCase = BlockUserUseCase(userRepository)
     val unblockUserUseCase = UnblockUserUseCase(userRepository)
     val changeUserRoleUseCase = ChangeUserRoleUseCase(userRepository)
+    val getUsersForOperationFiltersUseCase = GetUsersForOperationFiltersUseCase(userRepository)
 
     // Categories
     val getCategoriesUseCase = GetCategoriesUseCase(categoryRepository)
@@ -111,6 +114,7 @@ class AppContainer(context: Context) {
     val createIssueUseCase = CreateIssueUseCase(stockRepository)
     val createWriteOffUseCase = CreateWriteOffUseCase(stockRepository)
     val createInventoryUseCase = CreateInventoryUseCase(stockRepository)
+    val getOperationHistoryUseCase = GetOperationHistoryUseCase(stockRepository)
     val getProductHistoryUseCase = GetProductHistoryUseCase(stockRepository)
 
     // Reports

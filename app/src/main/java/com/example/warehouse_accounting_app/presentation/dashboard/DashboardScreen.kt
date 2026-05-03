@@ -185,7 +185,7 @@ private fun buildSections(role: UserRole): List<DashboardSection> = buildList {
             add(DashboardSection(AppRoutes.Issue, "Расход", "Выдача или продажа товаров", Icons.Filled.Output))
             add(DashboardSection(AppRoutes.WriteOff, "Списание", "Учёт брака, потерь и повреждений", Icons.Filled.DeleteForever))
             add(DashboardSection(AppRoutes.Inventory, "Инвентаризация", "Сверка учётного и фактического количества", Icons.Filled.FactCheck))
-            add(DashboardSection(AppRoutes.OperationHistory, "История операций", "Все движения товаров на складе", Icons.Filled.History))
+            add(DashboardSection(AppRoutes.OperationHistory, "История", "Все движения товаров на складе", Icons.Filled.History))
             add(DashboardSection(AppRoutes.Reports, "Отчёты", "Аналитика по остаткам и движениям товаров", Icons.Filled.BarChart))
             add(DashboardSection(AppRoutes.Profile, "Профиль", "Данные учётной записи и выход", Icons.Filled.Person))
         }
@@ -197,7 +197,7 @@ private fun buildSections(role: UserRole): List<DashboardSection> = buildList {
             add(DashboardSection(AppRoutes.Issue, "Расход", "Выдача или продажа товаров", Icons.Filled.Output))
             add(DashboardSection(AppRoutes.WriteOff, "Списание", "Учёт брака и потерь", Icons.Filled.DeleteForever))
             add(DashboardSection(AppRoutes.Inventory, "Инвентаризация", "Сверка остатков", Icons.Filled.FactCheck))
-            add(DashboardSection(AppRoutes.OperationHistory, "История операций", "Все движения товаров", Icons.Filled.History))
+            add(DashboardSection(AppRoutes.OperationHistory, "История", "Все движения товаров", Icons.Filled.History))
             add(DashboardSection(AppRoutes.Profile, "Профиль", "Данные учётной записи", Icons.Filled.Person))
         }
         UserRole.MANAGER -> {
@@ -205,7 +205,7 @@ private fun buildSections(role: UserRole): List<DashboardSection> = buildList {
             add(DashboardSection(AppRoutes.Products, "Товары", "Каталог товаров", Icons.Filled.Inventory))
             add(DashboardSection(AppRoutes.StockBalances, "Остатки", "Текущее количество товаров", Icons.Filled.Warehouse))
             add(DashboardSection(AppRoutes.LowStock, "Низкие остатки", "Товары для пополнения", Icons.Filled.TrendingDown))
-            add(DashboardSection(AppRoutes.OperationHistory, "История операций", "Все движения товаров", Icons.Filled.History))
+            add(DashboardSection(AppRoutes.OperationHistory, "История", "Все движения товаров", Icons.Filled.History))
             add(DashboardSection(AppRoutes.Reports, "Отчёты", "Аналитика по складу", Icons.Filled.BarChart))
             add(DashboardSection(AppRoutes.Profile, "Профиль", "Данные учётной записи", Icons.Filled.Person))
         }

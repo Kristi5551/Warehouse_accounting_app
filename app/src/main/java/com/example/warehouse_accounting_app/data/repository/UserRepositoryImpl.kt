@@ -7,8 +7,10 @@ import com.example.warehouse_accounting_app.core.network.logApiException
 import com.example.warehouse_accounting_app.core.network.logNetworkFailure
 import com.example.warehouse_accounting_app.core.result.AppResult
 import com.example.warehouse_accounting_app.data.mapper.toDomain
+import com.example.warehouse_accounting_app.data.mapper.toUserPick
 import com.example.warehouse_accounting_app.data.remote.api.UserApi
 import com.example.warehouse_accounting_app.domain.model.User
+import com.example.warehouse_accounting_app.domain.model.UserPick
 import com.example.warehouse_accounting_app.domain.model.UserRole
 import com.example.warehouse_accounting_app.domain.repository.UserRepository
 import java.io.IOException
@@ -112,5 +114,20 @@ class UserRepositoryImpl(
         } catch (e: Exception) {
             logNetworkFailure(e, "PATCH /api/users/$id/role")
             AppResult.Error("Не удалось изменить роль", e)
+        }
+
+    override suspend fun getUsersForOperationFilters(): AppResult<List<UserPick>> =
+        try {
+            AppResult.Success(api.getUsersForOperationFilters().map { it.toUserPick() })
+        } catch (e: ApiException) {
+            logApiException(e, "GET /api/users/for-operation-filters")
+            handleUnauthorized(e)
+            AppResult.Error(e.message ?: "Не удалось загрузить список пользователей", e)
+        } catch (e: IOException) {
+            logNetworkFailure(e, "GET /api/users/for-operation-filters")
+            AppResult.Error(connectivityMessage(e), e)
+        } catch (e: Exception) {
+            logNetworkFailure(e, "GET /api/users/for-operation-filters")
+            AppResult.Error("Не удалось загрузить список пользователей", e)
         }
 }

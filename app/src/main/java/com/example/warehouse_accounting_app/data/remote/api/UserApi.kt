@@ -5,6 +5,7 @@ import com.example.warehouse_accounting_app.core.network.ApiException
 import com.example.warehouse_accounting_app.data.remote.dto.request.ApproveUserRequestDto
 import com.example.warehouse_accounting_app.data.remote.dto.request.ChangeUserRoleRequestDto
 import com.example.warehouse_accounting_app.data.remote.dto.response.ErrorResponseDto
+import com.example.warehouse_accounting_app.data.remote.dto.response.UserBriefResponseDto
 import com.example.warehouse_accounting_app.data.remote.dto.response.UserResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -24,6 +25,14 @@ class UserApi(
     suspend fun getUsers(): List<UserResponseDto> {
         val response = client.get(AppConfig.url("api/users"))
         return parseList(response)
+    }
+
+    suspend fun getUsersForOperationFilters(): List<UserBriefResponseDto> {
+        val response = client.get(AppConfig.url("api/users/for-operation-filters"))
+        if (!response.status.isSuccess()) {
+            throw parseError(response.status.value, response.bodyAsText())
+        }
+        return response.body()
     }
 
     suspend fun getPendingUsers(): List<UserResponseDto> {
