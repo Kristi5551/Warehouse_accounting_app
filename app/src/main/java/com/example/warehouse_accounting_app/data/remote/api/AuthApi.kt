@@ -9,6 +9,8 @@ import com.example.warehouse_accounting_app.data.remote.dto.response.ErrorRespon
 import com.example.warehouse_accounting_app.data.remote.dto.response.UserResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.auth.authProvider
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -23,6 +25,11 @@ class AuthApi(
     private val client: HttpClient,
     private val json: Json,
 ) {
+    /** Сброс кэша JWT в Ktor Bearer: после смены токена в DataStore иначе уходят запросы со старым токеном. */
+    fun clearCachedAuthTokens() {
+        client.authProvider<BearerAuthProvider>()?.clearToken()
+    }
+
     suspend fun register(body: RegisterRequestDto): UserResponseDto {
         val response = client.post(AppConfig.url("api/auth/register")) {
             headers.append(HttpHeaders.ContentType, ContentType.Application.Json.toString())

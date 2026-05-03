@@ -10,6 +10,8 @@ import com.example.warehouse_accounting_app.data.remote.dto.response.UserBriefRe
 import com.example.warehouse_accounting_app.data.remote.dto.response.UserResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.auth.authProvider
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
@@ -25,6 +27,10 @@ class UserApi(
     private val client: HttpClient,
     private val json: Json,
 ) {
+    fun clearCachedAuthTokens() {
+        client.authProvider<BearerAuthProvider>()?.clearToken()
+    }
+
     suspend fun createAdmin(request: CreateAdminUserRequestDto): UserResponseDto {
         val response =
             client.post(AppConfig.url("api/users/admin")) {

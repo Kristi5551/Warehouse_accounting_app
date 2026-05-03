@@ -35,6 +35,7 @@ class AuthRepositoryImpl(
                 AppResult.Error("Сервер не вернул токен", IllegalStateException("empty token"))
             } else {
                 authDataStore.saveToken(response.token)
+                api.clearCachedAuthTokens()
                 if (BuildConfig.DEBUG) {
                     val saved = !authDataStore.getTokenOnce().isNullOrBlank()
                     Log.d(AUTH_LOG_TAG, "token saved = $saved")
@@ -90,6 +91,7 @@ class AuthRepositoryImpl(
             logApiException(e, "GET /api/auth/me")
             if (e.statusCode == 401 || e.statusCode == 403) {
                 authDataStore.clearToken()
+                api.clearCachedAuthTokens()
             }
             AppResult.Error(e.message ?: "Не удалось получить данные пользователя", e)
         } catch (e: IOException) {
@@ -102,6 +104,7 @@ class AuthRepositoryImpl(
 
     override suspend fun logout() {
         authDataStore.clearToken()
+        api.clearCachedAuthTokens()
     }
 
     override fun observeToken(): Flow<String?> = authDataStore.observeToken()

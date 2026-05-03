@@ -24,6 +24,7 @@ class UserRepositoryImpl(
     private suspend fun handleUnauthorized(e: ApiException) {
         if (e.statusCode == 401) {
             authDataStore.clearToken()
+            api.clearCachedAuthTokens()
         }
     }
 
