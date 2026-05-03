@@ -1,17 +1,8 @@
 package com.example.warehouse_accounting_app.core.navigation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,8 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
-import com.example.warehouse_accounting_app.core.ui.components.AppScaffold
-import com.example.warehouse_accounting_app.core.ui.components.AppTopBar
+import com.example.warehouse_accounting_app.domain.model.RolePermissions
 import com.example.warehouse_accounting_app.presentation.auth.login.LoginScreen
 import com.example.warehouse_accounting_app.presentation.auth.register.RegisterScreen
 import com.example.warehouse_accounting_app.presentation.categories.CategoryEditScreen
@@ -34,7 +24,6 @@ import com.example.warehouse_accounting_app.presentation.products.ProductDetails
 import com.example.warehouse_accounting_app.presentation.products.ProductEditScreen
 import com.example.warehouse_accounting_app.presentation.products.ProductListScreen
 import com.example.warehouse_accounting_app.presentation.profile.ProfileScreen
-import com.example.warehouse_accounting_app.presentation.reports.ReportsAccessViewModel
 import com.example.warehouse_accounting_app.presentation.reports.ReportsScreen
 import com.example.warehouse_accounting_app.presentation.splash.SplashDestination
 import com.example.warehouse_accounting_app.presentation.splash.SplashScreenContent
@@ -59,6 +48,7 @@ fun AppNavGraph(
 ) {
     NavHost(navController = navController, startDestination = AppRoutes.Splash, modifier = modifier) {
 
+        // ── Splash ────────────────────────────────────────────────────────────
         composable(AppRoutes.Splash) {
             val vm: SplashViewModel = viewModel(factory = viewModelFactory)
             val destination by vm.destination.collectAsStateWithLifecycle()
@@ -84,6 +74,7 @@ fun AppNavGraph(
             )
         }
 
+        // ── Auth ──────────────────────────────────────────────────────────────
         composable(AppRoutes.Login) {
             LoginScreen(
                 viewModelFactory = viewModelFactory,
@@ -96,6 +87,7 @@ fun AppNavGraph(
             RegisterScreen(viewModelFactory = viewModelFactory, onBackToLogin = { navController.popBackStack() })
         }
 
+        // ── Dashboard ─────────────────────────────────────────────────────────
         composable(AppRoutes.Dashboard) {
             DashboardScreen(
                 viewModelFactory = viewModelFactory,
@@ -104,15 +96,32 @@ fun AppNavGraph(
             )
         }
 
+        // ── Profile (все роли) ────────────────────────────────────────────────
         composable(AppRoutes.Profile) {
-            ProfileScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() }, onLogout = { navController.logout() })
+            ProfileScreen(
+                viewModelFactory = viewModelFactory,
+                onBack = { navController.popBackStack() },
+                onLogout = { navController.logout() },
+            )
         }
 
+        // ── Users (только ADMIN) ──────────────────────────────────────────────
         composable(AppRoutes.Users) {
-            UserListScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() }, onSessionExpired = { navController.logout() })
+            RoleGuard(
+                viewModelFactory = viewModelFactory,
+                allowed = { RolePermissions.canOpenUsers(it) },
+                onBack = { navController.popBackStack() },
+            ) {
+                UserListScreen(
+                    viewModelFactory = viewModelFactory,
+                    onBack = { navController.popBackStack() },
+                    onSessionExpired = { navController.logout() },
+                )
+            }
         }
 
-        // ── Categories ──────────────────────────────────────────────────────
+        // ── Categories ────────────────────────────────────────────────────────
+        // Список — все роли; создание и редактирование — только ADMIN (guard на edit-экранах)
         composable(AppRoutes.Categories) {
             CategoryListScreen(
                 viewModelFactory = viewModelFactory,
@@ -123,13 +132,38 @@ fun AppNavGraph(
             )
         }
         composable(AppRoutes.CategoryNew) {
-            CategoryEditScreen(viewModelFactory = viewModelFactory, categoryId = null, onSaved = { navController.popBackStack() }, onBack = { navController.popBackStack() }, onSessionExpired = { navController.logout() })
+            RoleGuard(
+                viewModelFactory = viewModelFactory,
+                allowed = { RolePermissions.canEditCategories(it) },
+                onBack = { navController.popBackStack() },
+            ) {
+                CategoryEditScreen(
+                    viewModelFactory = viewModelFactory,
+                    categoryId = null,
+                    onSaved = { navController.popBackStack() },
+                    onBack = { navController.popBackStack() },
+                    onSessionExpired = { navController.logout() },
+                )
+            }
         }
         composable(AppRoutes.CategoryEdit, arguments = listOf(navArgument("id") { type = NavType.LongType })) { back ->
-            CategoryEditScreen(viewModelFactory = viewModelFactory, categoryId = back.arguments?.getLong("id"), onSaved = { navController.popBackStack() }, onBack = { navController.popBackStack() }, onSessionExpired = { navController.logout() })
+            RoleGuard(
+                viewModelFactory = viewModelFactory,
+                allowed = { RolePermissions.canEditCategories(it) },
+                onBack = { navController.popBackStack() },
+            ) {
+                CategoryEditScreen(
+                    viewModelFactory = viewModelFactory,
+                    categoryId = back.arguments?.getLong("id"),
+                    onSaved = { navController.popBackStack() },
+                    onBack = { navController.popBackStack() },
+                    onSessionExpired = { navController.logout() },
+                )
+            }
         }
 
-        // ── Products ─────────────────────────────────────────────────────────
+        // ── Products ──────────────────────────────────────────────────────────
+        // Список и детали — все роли; создание и редактирование — только ADMIN
         composable(AppRoutes.Products) {
             ProductListScreen(
                 viewModelFactory = viewModelFactory,
@@ -141,64 +175,131 @@ fun AppNavGraph(
             )
         }
         composable(AppRoutes.ProductNew) {
-            ProductEditScreen(viewModelFactory = viewModelFactory, productId = null, onSaved = { navController.popBackStack() }, onBack = { navController.popBackStack() }, onSessionExpired = { navController.logout() })
+            RoleGuard(
+                viewModelFactory = viewModelFactory,
+                allowed = { RolePermissions.canEditProducts(it) },
+                onBack = { navController.popBackStack() },
+            ) {
+                ProductEditScreen(
+                    viewModelFactory = viewModelFactory,
+                    productId = null,
+                    onSaved = { navController.popBackStack() },
+                    onBack = { navController.popBackStack() },
+                    onSessionExpired = { navController.logout() },
+                )
+            }
         }
         composable(AppRoutes.ProductDetails, arguments = listOf(navArgument("id") { type = NavType.LongType })) { back ->
-            ProductDetailsScreen(viewModelFactory = viewModelFactory, productId = back.arguments!!.getLong("id"), onBack = { navController.popBackStack() }, onNavigateToEdit = { navController.navigate(AppRoutes.productEdit(it)) }, onSessionExpired = { navController.logout() })
+            ProductDetailsScreen(
+                viewModelFactory = viewModelFactory,
+                productId = back.arguments!!.getLong("id"),
+                onBack = { navController.popBackStack() },
+                onNavigateToEdit = { navController.navigate(AppRoutes.productEdit(it)) },
+                onSessionExpired = { navController.logout() },
+            )
         }
         composable(AppRoutes.ProductEdit, arguments = listOf(navArgument("id") { type = NavType.LongType })) { back ->
-            ProductEditScreen(viewModelFactory = viewModelFactory, productId = back.arguments?.getLong("id"), onSaved = { navController.popBackStack() }, onBack = { navController.popBackStack() }, onSessionExpired = { navController.logout() })
+            RoleGuard(
+                viewModelFactory = viewModelFactory,
+                allowed = { RolePermissions.canEditProducts(it) },
+                onBack = { navController.popBackStack() },
+            ) {
+                ProductEditScreen(
+                    viewModelFactory = viewModelFactory,
+                    productId = back.arguments?.getLong("id"),
+                    onSaved = { navController.popBackStack() },
+                    onBack = { navController.popBackStack() },
+                    onSessionExpired = { navController.logout() },
+                )
+            }
         }
 
         // ── Stock ─────────────────────────────────────────────────────────────
+        // Остатки — все роли
         composable(AppRoutes.StockBalances) {
             StockBalanceScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
         }
+
+        // Низкие остатки — только ADMIN и MANAGER
         composable(AppRoutes.LowStock) {
-            LowStockScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
-        }
-        composable(AppRoutes.Receipt) {
-            ReceiptScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() }, onSuccess = { navController.navigate(AppRoutes.StockBalances) { popUpTo(AppRoutes.Receipt) { inclusive = true } } })
-        }
-        composable(AppRoutes.Issue) {
-            IssueScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() }, onSuccess = { navController.navigate(AppRoutes.StockBalances) { popUpTo(AppRoutes.Issue) { inclusive = true } } })
-        }
-        composable(AppRoutes.WriteOff) {
-            WriteOffScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() }, onSuccess = { navController.navigate(AppRoutes.StockBalances) { popUpTo(AppRoutes.WriteOff) { inclusive = true } } })
-        }
-        composable(AppRoutes.Inventory) {
-            InventoryScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() }, onSuccess = { navController.navigate(AppRoutes.StockBalances) { popUpTo(AppRoutes.Inventory) { inclusive = true } } })
+            RoleGuard(
+                viewModelFactory = viewModelFactory,
+                allowed = { RolePermissions.canOpenLowStock(it) },
+                onBack = { navController.popBackStack() },
+            ) {
+                LowStockScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
+            }
         }
 
-        // ── Operations & Reports ───────────────────────────────────────────────
+        // Складские операции — только ADMIN и STOREKEEPER
+        composable(AppRoutes.Receipt) {
+            RoleGuard(
+                viewModelFactory = viewModelFactory,
+                allowed = { RolePermissions.canCreateStockOperations(it) },
+                onBack = { navController.popBackStack() },
+            ) {
+                ReceiptScreen(
+                    viewModelFactory = viewModelFactory,
+                    onBack = { navController.popBackStack() },
+                    onSuccess = { navController.navigate(AppRoutes.StockBalances) { popUpTo(AppRoutes.Receipt) { inclusive = true } } },
+                )
+            }
+        }
+        composable(AppRoutes.Issue) {
+            RoleGuard(
+                viewModelFactory = viewModelFactory,
+                allowed = { RolePermissions.canCreateStockOperations(it) },
+                onBack = { navController.popBackStack() },
+            ) {
+                IssueScreen(
+                    viewModelFactory = viewModelFactory,
+                    onBack = { navController.popBackStack() },
+                    onSuccess = { navController.navigate(AppRoutes.StockBalances) { popUpTo(AppRoutes.Issue) { inclusive = true } } },
+                )
+            }
+        }
+        composable(AppRoutes.WriteOff) {
+            RoleGuard(
+                viewModelFactory = viewModelFactory,
+                allowed = { RolePermissions.canCreateStockOperations(it) },
+                onBack = { navController.popBackStack() },
+            ) {
+                WriteOffScreen(
+                    viewModelFactory = viewModelFactory,
+                    onBack = { navController.popBackStack() },
+                    onSuccess = { navController.navigate(AppRoutes.StockBalances) { popUpTo(AppRoutes.WriteOff) { inclusive = true } } },
+                )
+            }
+        }
+        composable(AppRoutes.Inventory) {
+            RoleGuard(
+                viewModelFactory = viewModelFactory,
+                allowed = { RolePermissions.canCreateStockOperations(it) },
+                onBack = { navController.popBackStack() },
+            ) {
+                InventoryScreen(
+                    viewModelFactory = viewModelFactory,
+                    onBack = { navController.popBackStack() },
+                    onSuccess = { navController.navigate(AppRoutes.StockBalances) { popUpTo(AppRoutes.Inventory) { inclusive = true } } },
+                )
+            }
+        }
+
+        // ── Operations & Reports ──────────────────────────────────────────────
+        // История — все роли
         composable(AppRoutes.OperationHistory) {
             OperationHistoryScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
         }
-        composable(AppRoutes.Reports) {
-            val gate: ReportsAccessViewModel = viewModel(factory = viewModelFactory)
-            val access by gate.access.collectAsStateWithLifecycle()
-            when (access) {
-                ReportsAccessViewModel.AccessState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                }
-                ReportsAccessViewModel.AccessState.Denied -> {
-                    LaunchedEffect(Unit) { navController.popBackStack() }
-                }
-                ReportsAccessViewModel.AccessState.Allowed -> {
-                    ReportsScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
-                }
-            }
-        }
-    }
-}
 
-@Composable
-private fun Placeholder(title: String, onBack: () -> Unit) {
-    AppScaffold(topBar = { AppTopBar(title = title, onBack = onBack) }) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Text("Раздел находится в разработке", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        // Отчёты — только ADMIN и MANAGER
+        composable(AppRoutes.Reports) {
+            RoleGuard(
+                viewModelFactory = viewModelFactory,
+                allowed = { RolePermissions.canOpenReports(it) },
+                onBack = { navController.popBackStack() },
+            ) {
+                ReportsScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
+            }
         }
     }
 }

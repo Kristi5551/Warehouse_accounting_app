@@ -11,7 +11,6 @@ import com.example.warehouse_accounting_app.presentation.operations.OperationHis
 import com.example.warehouse_accounting_app.presentation.products.ProductEditViewModel
 import com.example.warehouse_accounting_app.presentation.products.ProductListViewModel
 import com.example.warehouse_accounting_app.presentation.profile.ProfileViewModel
-import com.example.warehouse_accounting_app.presentation.reports.ReportsAccessViewModel
 import com.example.warehouse_accounting_app.presentation.reports.ReportsViewModel
 import com.example.warehouse_accounting_app.presentation.splash.SplashViewModel
 import com.example.warehouse_accounting_app.presentation.stock.inventory.InventoryViewModel
@@ -20,6 +19,7 @@ import com.example.warehouse_accounting_app.presentation.stock.balances.LowStock
 import com.example.warehouse_accounting_app.presentation.stock.balances.StockBalanceViewModel
 import com.example.warehouse_accounting_app.presentation.stock.receipt.ReceiptViewModel
 import com.example.warehouse_accounting_app.presentation.stock.writeoff.WriteOffViewModel
+import com.example.warehouse_accounting_app.core.navigation.RouteGuardViewModel
 import com.example.warehouse_accounting_app.presentation.users.UserListViewModel
 
 class WarehouseViewModelFactory(private val container: AppContainer) : ViewModelProvider.Factory {
@@ -59,8 +59,8 @@ class WarehouseViewModelFactory(private val container: AppContainer) : ViewModel
                     c.getProductsUseCase,
                     c.getUsersForOperationFiltersUseCase,
                 ) as T
-            modelClass.isAssignableFrom(ReportsAccessViewModel::class.java) -> ReportsAccessViewModel(c.getCurrentUserUseCase) as T
             modelClass.isAssignableFrom(ReportsViewModel::class.java) -> ReportsViewModel(c.getStockSummaryReportUseCase, c.getLowStockReportUseCase, c.getOperationsReportUseCase, c.getStockValueReportUseCase) as T
+            modelClass.isAssignableFrom(RouteGuardViewModel::class.java) -> RouteGuardViewModel(c.getCurrentUserUseCase) as T
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
         }
     }
