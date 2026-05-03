@@ -65,12 +65,23 @@ fun AppNavGraph(
             LaunchedEffect(Unit) { vm.startCheck() }
             LaunchedEffect(destination) {
                 when (destination) {
-                    SplashDestination.Login -> navController.navigate(AppRoutes.Login) { popUpTo(AppRoutes.Splash) { inclusive = true } }
-                    SplashDestination.Dashboard -> navController.navigate(AppRoutes.Dashboard) { popUpTo(AppRoutes.Splash) { inclusive = true } }
-                    null -> Unit
+                    SplashDestination.Login ->
+                        navController.navigate(AppRoutes.Login) { popUpTo(AppRoutes.Splash) { inclusive = true } }
+                    SplashDestination.Dashboard ->
+                        navController.navigate(AppRoutes.Dashboard) { popUpTo(AppRoutes.Splash) { inclusive = true } }
+                    is SplashDestination.Error, null -> Unit
                 }
             }
-            SplashScreenContent()
+            val errorMessage = (destination as? SplashDestination.Error)?.message
+            SplashScreenContent(
+                error = errorMessage,
+                onRetry = { vm.startCheck() },
+                onLoginAnyway = {
+                    navController.navigate(AppRoutes.Login) {
+                        popUpTo(AppRoutes.Splash) { inclusive = true }
+                    }
+                },
+            )
         }
 
         composable(AppRoutes.Login) {

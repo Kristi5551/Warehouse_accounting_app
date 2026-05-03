@@ -7,6 +7,7 @@ import com.example.warehouse_accounting_app.core.network.ApiException
 import com.example.warehouse_accounting_app.core.network.connectivityMessage
 import com.example.warehouse_accounting_app.core.network.logApiException
 import com.example.warehouse_accounting_app.core.network.logNetworkFailure
+import com.example.warehouse_accounting_app.core.result.AppError
 import com.example.warehouse_accounting_app.core.result.AppResult
 import com.example.warehouse_accounting_app.data.mapper.toDomain
 import com.example.warehouse_accounting_app.data.remote.api.AuthApi
@@ -92,14 +93,20 @@ class AuthRepositoryImpl(
             if (e.statusCode == 401 || e.statusCode == 403) {
                 authDataStore.clearToken()
                 api.clearCachedAuthTokens()
+                val msg = e.message ?: "Сессия истекла. Войдите снова."
+                AppResult.Error(msg, e, appError = AppError.Unauthorized(msg))
+            } else {
+                val msg = e.message ?: "Ошибка сервера"
+                AppResult.Error(msg, e, appError = AppError.Server(msg))
             }
-            AppResult.Error(e.message ?: "Не удалось получить данные пользователя", e)
         } catch (e: IOException) {
             logNetworkFailure(e, "GET /api/auth/me")
-            AppResult.Error(connectivityMessage(e), e)
+            val msg = connectivityMessage(e)
+            AppResult.Error(msg, e, appError = AppError.Network(msg))
         } catch (e: Exception) {
             logNetworkFailure(e, "GET /api/auth/me")
-            AppResult.Error(e.message ?: "Не удалось получить данные пользователя", e)
+            val msg = e.message ?: "Не удалось получить данные пользователя"
+            AppResult.Error(msg, e, appError = AppError.Unknown(msg))
         }
 
     override suspend fun logout() {

@@ -1,28 +1,40 @@
 package com.example.warehouse_accounting_app.domain.usecase.auth
 
-import com.example.warehouse_accounting_app.core.network.ApiException
+import com.example.warehouse_accounting_app.core.result.AppError
 import com.example.warehouse_accounting_app.core.result.AppResult
 import com.example.warehouse_accounting_app.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.first
 
+/**
+ * Проверяет, авторизован ли пользователь при старте приложения.
+ *
+ * Алгоритм:
+ * 1. Если токена нет — [AuthCheckResult.Unauthenticated].
+ * 2. Если токен есть — вызывает /api/auth/me.
+ * 3. Успех — [AuthCheckResult.Authenticated].
+ * 4. 401/403 — очищает токен, возвращает [AuthCheckResult.Unauthenticated].
+ * 5. Сетевая ошибка — [AuthCheckResult.NetworkError] (НЕ считаем авторизованным).
+ * 6. Прочая ошибка — [AuthCheckResult.UnknownError] (НЕ считаем авторизованным).
+ *
+ * Зависимости: только domain-репозиторий + core.result — без core.network.
+ */
 class CheckAuthStateUseCase(
     private val repository: AuthRepository,
 ) {
-    suspend operator fun invoke(): Boolean {
+    suspend operator fun invoke(): AuthCheckResult {
         val token = repository.observeToken().first()
-        if (token.isNullOrBlank()) return false
-        return when (val r = repository.getCurrentUser()) {
-            is AppResult.Success -> true
-            is AppResult.Error -> {
-                val t = r.throwable
-                val unauthorized = t is ApiException && (t.statusCode == 401 || t.statusCode == 403)
-                if (unauthorized) {
+        if (token.isNullOrBlank()) return AuthCheckResult.Unauthenticated
+
+        return when (val result = repository.getCurrentUser()) {
+            is AppResult.Success -> AuthCheckResult.Authenticated(result.data)
+            is AppResult.Error -> when (result.appError) {
+                is AppError.Unauthorized -> {
                     repository.logout()
-                    false
-                } else {
-                    // Сеть, таймаут, 5xx — токен в DataStore не трогаем (getCurrentUser уже чистит только 401/403).
-                    true
+                    AuthCheckResult.Unauthenticated
                 }
+                is AppError.Network -> AuthCheckResult.NetworkError(result.message)
+                is AppError.Server -> AuthCheckResult.UnknownError(result.message)
+                is AppError.Unknown, null -> AuthCheckResult.UnknownError(result.message)
             }
         }
     }
