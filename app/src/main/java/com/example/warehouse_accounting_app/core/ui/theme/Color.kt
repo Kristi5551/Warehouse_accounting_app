@@ -32,3 +32,21 @@ val ColorError = Color(0xFFB3261E)
 val ColorErrorContainer = Color(0xFFFFDAD6)
 val ColorNeutral = Color(0xFF757575)
 val ColorNeutralContainer = Color(0xFFF5F5F5)
+
+// Operation type colors — used in OperationTypeChip and history rows
+val ColorOpReceipt = Color(0xFF2E7D32)         // green
+val ColorOpReceiptContainer = Color(0xFFE8F5E9)
+val ColorOpIssue = Color(0xFF1565C0)            // blue
+val ColorOpIssueContainer = Color(0xFFE3F2FD)
+val ColorOpWriteOff = Color(0xFFB71C1C)         // deep red
+val ColorOpWriteOffContainer = Color(0xFFFFEBEE)
+val ColorOpInventory = Color(0xFF6A1B9A)        // purple
+val ColorOpInventoryContainer = Color(0xFFF3E5F5)
+
+// Stock status colors
+val ColorStockInStock = Color(0xFF2E7D32)
+val ColorStockInStockContainer = Color(0xFFE8F5E9)
+val ColorStockLow = Color(0xFFE65100)
+val ColorStockLowContainer = Color(0xFFFFF3E0)
+val ColorStockOut = Color(0xFFB71C1C)
+val ColorStockOutContainer = Color(0xFFFFEBEE)

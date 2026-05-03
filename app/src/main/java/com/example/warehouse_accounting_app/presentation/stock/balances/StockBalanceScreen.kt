@@ -13,8 +13,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +28,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.example.warehouse_accounting_app.core.ui.theme.ColorStockInStockContainer
+import com.example.warehouse_accounting_app.core.ui.theme.ColorStockLow
+import com.example.warehouse_accounting_app.core.ui.theme.ColorStockLowContainer
+import com.example.warehouse_accounting_app.core.ui.theme.ColorStockOutContainer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,6 +42,7 @@ import com.example.warehouse_accounting_app.core.ui.components.AppTopBar
 import com.example.warehouse_accounting_app.core.ui.components.EmptyContent
 import com.example.warehouse_accounting_app.core.ui.components.ErrorContent
 import com.example.warehouse_accounting_app.core.ui.components.LoadingContent
+import com.example.warehouse_accounting_app.core.ui.components.StockStatusChip
 import com.example.warehouse_accounting_app.domain.model.StockBalance
 import com.example.warehouse_accounting_app.domain.model.StockStatus
 
@@ -95,7 +98,9 @@ fun StockBalanceScreen(
                             )
                         },
                         label = { Text("В наличии") },
-                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color(0xFFD4EDDA)),
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = ColorStockInStockContainer,
+                        ),
                     )
                 }
                 item {
@@ -109,7 +114,9 @@ fun StockBalanceScreen(
                             )
                         },
                         label = { Text("Низкий остаток") },
-                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color(0xFFFFF3CD)),
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = ColorStockLowContainer,
+                        ),
                     )
                 }
                 item {
@@ -123,7 +130,9 @@ fun StockBalanceScreen(
                             )
                         },
                         label = { Text("Нет в наличии") },
-                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color(0xFFF8D7DA)),
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = ColorStockOutContainer,
+                        ),
                     )
                 }
             }
@@ -198,21 +207,6 @@ fun LowStockScreen(
 }
 
 @Composable
-private fun StockStatusChip(status: StockStatus) {
-    val (label, container, labelColor) = when (status) {
-        StockStatus.IN_STOCK -> Triple("В наличии", Color(0xFFD4EDDA), Color(0xFF198754))
-        StockStatus.LOW_STOCK -> Triple("Низкий остаток", Color(0xFFFFF3CD), Color(0xFFB8860B))
-        StockStatus.OUT_OF_STOCK -> Triple("Нет в наличии", Color(0xFFF8D7DA), Color(0xFFDC3545))
-    }
-    AssistChip(
-        onClick = {},
-        enabled = false,
-        label = { Text(label, color = labelColor, style = MaterialTheme.typography.labelMedium) },
-        colors = AssistChipDefaults.assistChipColors(containerColor = container, disabledContainerColor = container),
-    )
-}
-
-@Composable
 fun BalanceCard(balance: StockBalance) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -278,7 +272,7 @@ private fun LowBalanceCard(balance: StockBalance) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF8E1)),
+        colors = CardDefaults.cardColors(containerColor = ColorStockLowContainer),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -298,7 +292,7 @@ private fun LowBalanceCard(balance: StockBalance) {
                     "Остаток: ${formatQty(balance.quantity)}",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFE67E22),
+                    color = ColorStockLow,
                 )
                 Text("Мин.: ${formatQty(balance.minStock)}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
