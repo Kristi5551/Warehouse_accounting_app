@@ -8,6 +8,7 @@ import com.example.warehouse_accounting_app.presentation.categories.CategoryEdit
 import com.example.warehouse_accounting_app.presentation.categories.CategoryListViewModel
 import com.example.warehouse_accounting_app.presentation.dashboard.DashboardViewModel
 import com.example.warehouse_accounting_app.presentation.operations.OperationHistoryViewModel
+import com.example.warehouse_accounting_app.presentation.products.ProductDetailsViewModel
 import com.example.warehouse_accounting_app.presentation.products.ProductEditViewModel
 import com.example.warehouse_accounting_app.presentation.products.ProductListViewModel
 import com.example.warehouse_accounting_app.presentation.profile.ProfileViewModel
@@ -35,6 +36,7 @@ class WarehouseViewModelFactory(private val container: AppContainer) : ViewModel
             modelClass.isAssignableFrom(UserListViewModel::class.java) ->
                 UserListViewModel(
                     c.getUsersUseCase,
+                    c.getPendingUsersUseCase,
                     c.approveUserUseCase,
                     c.blockUserUseCase,
                     c.unblockUserUseCase,
@@ -45,6 +47,8 @@ class WarehouseViewModelFactory(private val container: AppContainer) : ViewModel
             modelClass.isAssignableFrom(CategoryListViewModel::class.java) -> CategoryListViewModel(c.getCategoriesUseCase, c.deleteCategoryUseCase, c.getCurrentUserUseCase) as T
             modelClass.isAssignableFrom(CategoryEditViewModel::class.java) -> CategoryEditViewModel(c.getCategoryByIdUseCase, c.createCategoryUseCase, c.updateCategoryUseCase) as T
             modelClass.isAssignableFrom(ProductListViewModel::class.java) -> ProductListViewModel(c.getProductsUseCase, c.deleteProductUseCase, c.getCurrentUserUseCase, c.getCategoriesUseCase) as T
+            modelClass.isAssignableFrom(ProductDetailsViewModel::class.java) ->
+                ProductDetailsViewModel(c.getProductDetailsUseCase, c.getProductHistoryUseCase, c.getCurrentUserUseCase) as T
             modelClass.isAssignableFrom(ProductEditViewModel::class.java) -> ProductEditViewModel(c.getProductDetailsUseCase, c.createProductUseCase, c.updateProductUseCase, c.getCategoriesUseCase) as T
             modelClass.isAssignableFrom(StockBalanceViewModel::class.java) -> StockBalanceViewModel(c.getStockBalancesUseCase) as T
             modelClass.isAssignableFrom(LowStockViewModel::class.java) -> LowStockViewModel(c.getLowStockUseCase) as T

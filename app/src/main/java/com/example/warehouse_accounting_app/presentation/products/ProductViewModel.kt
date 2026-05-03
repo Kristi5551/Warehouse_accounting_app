@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.warehouse_accounting_app.core.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.Product
 import com.example.warehouse_accounting_app.domain.model.UserRole
+import com.example.warehouse_accounting_app.domain.repository.StockHistoryFilter
 import com.example.warehouse_accounting_app.domain.usecase.auth.GetCurrentUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.category.GetCategoriesUseCase
 import com.example.warehouse_accounting_app.domain.usecase.product.CreateProductUseCase
@@ -12,6 +13,7 @@ import com.example.warehouse_accounting_app.domain.usecase.product.DeleteProduct
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductDetailsUseCase
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductsUseCase
 import com.example.warehouse_accounting_app.domain.usecase.product.UpdateProductUseCase
+import com.example.warehouse_accounting_app.domain.usecase.stock.GetProductHistoryUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,16 +44,19 @@ class ProductListViewModel(
 
     private fun loadUserRole() {
         viewModelScope.launch {
-            if (getCurrentUserUseCase() is AppResult.Success) {
-                currentUserRole = (getCurrentUserUseCase() as? AppResult.Success)?.data?.role
+            when (val result = getCurrentUserUseCase()) {
+                is AppResult.Success -> currentUserRole = result.data.role
+                is AppResult.Error -> Unit
             }
         }
     }
 
     private fun loadCategories() {
         viewModelScope.launch {
-            if (getCategoriesUseCase() is AppResult.Success)
-                _state.update { it.copy(categories = (getCategoriesUseCase() as AppResult.Success).data) }
+            when (val result = getCategoriesUseCase()) {
+                is AppResult.Success -> _state.update { it.copy(categories = result.data) }
+                is AppResult.Error -> Unit
+            }
         }
     }
 
@@ -87,6 +92,47 @@ class ProductListViewModel(
     fun onCreateClick() = viewModelScope.launch { _events.send(ProductListEvent.NavigateToCreate) }
     fun onEditClick(id: Long) = viewModelScope.launch { _events.send(ProductListEvent.NavigateToEdit(id)) }
     fun onDetailsClick(id: Long) = viewModelScope.launch { _events.send(ProductListEvent.NavigateToDetails(id)) }
+}
+
+// ── ProductDetailsViewModel ────────────────────────────────────────────────────
+
+/**
+ * ViewModel для экрана деталей товара.
+ * Загружает товар через GET /api/products/{id} (не из предварительно загруженного списка)
+ * и последние 10 операций через GET /api/stock/products/{id}/history.
+ */
+class ProductDetailsViewModel(
+    private val getProductDetailsUseCase: GetProductDetailsUseCase,
+    private val getProductHistoryUseCase: GetProductHistoryUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(ProductDetailsState())
+    val state = _state.asStateFlow()
+
+    fun loadProduct(productId: Long) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            val isAdmin = (getCurrentUserUseCase() as? AppResult.Success)?.data?.role == UserRole.ADMIN
+            when (val r = getProductDetailsUseCase(productId)) {
+                is AppResult.Success -> {
+                    _state.update { it.copy(isLoading = false, product = r.data, isAdmin = isAdmin) }
+                    loadHistory(productId)
+                }
+                is AppResult.Error -> _state.update { it.copy(isLoading = false, errorMessage = r.message) }
+            }
+        }
+    }
+
+    private fun loadHistory(productId: Long) {
+        viewModelScope.launch {
+            _state.update { it.copy(historyLoading = true) }
+            when (val r = getProductHistoryUseCase(productId, StockHistoryFilter())) {
+                is AppResult.Success -> _state.update { it.copy(historyLoading = false, history = r.data.take(10)) }
+                is AppResult.Error -> _state.update { it.copy(historyLoading = false) }
+            }
+        }
+    }
 }
 
 class ProductEditViewModel(

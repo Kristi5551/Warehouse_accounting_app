@@ -10,6 +10,7 @@ import com.example.warehouse_accounting_app.domain.usecase.user.ApproveUserUseCa
 import com.example.warehouse_accounting_app.domain.usecase.user.BlockUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.ChangeUserRoleUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.CreateAdminUserUseCase
+import com.example.warehouse_accounting_app.domain.usecase.user.GetPendingUsersUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.GetUsersUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.UnblockUserUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 
 class UserListViewModel(
     private val getUsers: GetUsersUseCase,
+    private val getPendingUsers: GetPendingUsersUseCase,
     private val approveUser: ApproveUserUseCase,
     private val blockUser: BlockUserUseCase,
     private val unblockUser: UnblockUserUseCase,
@@ -45,8 +47,8 @@ class UserListViewModel(
     fun onEvent(event: UserListEvent) {
         when (event) {
             is UserListEvent.FilterChanged -> {
-                val newFilter = event.filter
-                _state.update { it.copy(filter = newFilter, users = applyFilter(allUsers, newFilter)) }
+                _state.update { it.copy(filter = event.filter) }
+                viewModelScope.launch { load() }
             }
             UserListEvent.Refresh -> viewModelScope.launch { load() }
             is UserListEvent.Approve -> performMutation("Пользователь подтверждён") { approveUser(event.id) }
@@ -159,26 +161,39 @@ class UserListViewModel(
         }
     }
 
+    /**
+     * Загружает список пользователей с учётом текущего фильтра.
+     * - PENDING → GET /api/users/pending (оптимизированный endpoint)
+     * - остальные → GET /api/users с клиентской фильтрацией
+     */
     private suspend fun load() {
         _state.update { it.copy(isLoading = true, errorMessage = null) }
-        when (val r = getUsers()) {
-            is AppResult.Success -> {
-                allUsers = r.data
-                _state.update { state ->
-                    state.copy(
-                        isLoading = false,
-                        users = applyFilter(allUsers, state.filter),
-                    )
+        val currentFilter = _state.value.filter
+        if (currentFilter == UserListFilter.PENDING) {
+            when (val r = getPendingUsers()) {
+                is AppResult.Success -> {
+                    _state.update { it.copy(isLoading = false, users = r.data) }
+                }
+                is AppResult.Error -> {
+                    val code = (r.throwable as? ApiException)?.statusCode
+                    _state.update {
+                        it.copy(isLoading = false, errorMessage = r.message, sessionExpired = code == 401)
+                    }
                 }
             }
-            is AppResult.Error -> {
-                val code = (r.throwable as? ApiException)?.statusCode
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = r.message,
-                        sessionExpired = code == 401,
-                    )
+        } else {
+            when (val r = getUsers()) {
+                is AppResult.Success -> {
+                    allUsers = r.data
+                    _state.update { state ->
+                        state.copy(isLoading = false, users = applyFilter(allUsers, state.filter))
+                    }
+                }
+                is AppResult.Error -> {
+                    val code = (r.throwable as? ApiException)?.statusCode
+                    _state.update {
+                        it.copy(isLoading = false, errorMessage = r.message, sessionExpired = code == 401)
+                    }
                 }
             }
         }

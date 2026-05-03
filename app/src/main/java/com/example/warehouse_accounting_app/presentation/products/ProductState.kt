@@ -2,6 +2,7 @@ package com.example.warehouse_accounting_app.presentation.products
 
 import com.example.warehouse_accounting_app.domain.model.Category
 import com.example.warehouse_accounting_app.domain.model.Product
+import com.example.warehouse_accounting_app.domain.model.StockOperation
 
 data class ProductListState(
     val isLoading: Boolean = false,
@@ -50,3 +51,14 @@ data class ProductEditState(
 )
 
 val ProductEditState.isEditMode: Boolean get() = editingProduct != null
+
+// ── Details ───────────────────────────────────────────────────────────────────
+
+data class ProductDetailsState(
+    val isLoading: Boolean = true,
+    val product: Product? = null,
+    val errorMessage: String? = null,
+    val isAdmin: Boolean = false,
+    val history: List<StockOperation> = emptyList(),
+    val historyLoading: Boolean = false,
+)
