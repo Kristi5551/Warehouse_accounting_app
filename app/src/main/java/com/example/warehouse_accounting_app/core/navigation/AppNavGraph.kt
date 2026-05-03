@@ -111,6 +111,7 @@ fun AppNavGraph(
                 viewModelFactory = viewModelFactory,
                 allowed = { RolePermissions.canOpenUsers(it) },
                 onBack = { navController.popBackStack() },
+                onSessionExpired = { navController.logout() },
             ) {
                 UserListScreen(
                     viewModelFactory = viewModelFactory,
@@ -136,6 +137,7 @@ fun AppNavGraph(
                 viewModelFactory = viewModelFactory,
                 allowed = { RolePermissions.canEditCategories(it) },
                 onBack = { navController.popBackStack() },
+                onSessionExpired = { navController.logout() },
             ) {
                 CategoryEditScreen(
                     viewModelFactory = viewModelFactory,
@@ -151,6 +153,7 @@ fun AppNavGraph(
                 viewModelFactory = viewModelFactory,
                 allowed = { RolePermissions.canEditCategories(it) },
                 onBack = { navController.popBackStack() },
+                onSessionExpired = { navController.logout() },
             ) {
                 CategoryEditScreen(
                     viewModelFactory = viewModelFactory,
@@ -179,6 +182,7 @@ fun AppNavGraph(
                 viewModelFactory = viewModelFactory,
                 allowed = { RolePermissions.canEditProducts(it) },
                 onBack = { navController.popBackStack() },
+                onSessionExpired = { navController.logout() },
             ) {
                 ProductEditScreen(
                     viewModelFactory = viewModelFactory,
@@ -203,6 +207,7 @@ fun AppNavGraph(
                 viewModelFactory = viewModelFactory,
                 allowed = { RolePermissions.canEditProducts(it) },
                 onBack = { navController.popBackStack() },
+                onSessionExpired = { navController.logout() },
             ) {
                 ProductEditScreen(
                     viewModelFactory = viewModelFactory,
@@ -226,6 +231,7 @@ fun AppNavGraph(
                 viewModelFactory = viewModelFactory,
                 allowed = { RolePermissions.canOpenLowStock(it) },
                 onBack = { navController.popBackStack() },
+                onSessionExpired = { navController.logout() },
             ) {
                 LowStockScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
             }
@@ -237,6 +243,7 @@ fun AppNavGraph(
                 viewModelFactory = viewModelFactory,
                 allowed = { RolePermissions.canCreateStockOperations(it) },
                 onBack = { navController.popBackStack() },
+                onSessionExpired = { navController.logout() },
             ) {
                 ReceiptScreen(
                     viewModelFactory = viewModelFactory,
@@ -250,6 +257,7 @@ fun AppNavGraph(
                 viewModelFactory = viewModelFactory,
                 allowed = { RolePermissions.canCreateStockOperations(it) },
                 onBack = { navController.popBackStack() },
+                onSessionExpired = { navController.logout() },
             ) {
                 IssueScreen(
                     viewModelFactory = viewModelFactory,
@@ -263,6 +271,7 @@ fun AppNavGraph(
                 viewModelFactory = viewModelFactory,
                 allowed = { RolePermissions.canCreateStockOperations(it) },
                 onBack = { navController.popBackStack() },
+                onSessionExpired = { navController.logout() },
             ) {
                 WriteOffScreen(
                     viewModelFactory = viewModelFactory,
@@ -276,6 +285,7 @@ fun AppNavGraph(
                 viewModelFactory = viewModelFactory,
                 allowed = { RolePermissions.canCreateStockOperations(it) },
                 onBack = { navController.popBackStack() },
+                onSessionExpired = { navController.logout() },
             ) {
                 InventoryScreen(
                     viewModelFactory = viewModelFactory,
@@ -297,6 +307,7 @@ fun AppNavGraph(
                 viewModelFactory = viewModelFactory,
                 allowed = { RolePermissions.canOpenReports(it) },
                 onBack = { navController.popBackStack() },
+                onSessionExpired = { navController.logout() },
             ) {
                 ReportsScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
             }

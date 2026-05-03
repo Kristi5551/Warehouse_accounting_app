@@ -29,6 +29,9 @@ class RegisterUseCase(
         if (password != repeatPassword) {
             return AppResult.Error("Пароли не совпадают")
         }
+        if (requestedRole != UserRole.STOREKEEPER && requestedRole != UserRole.MANAGER) {
+            return AppResult.Error("Регистрация с ролью администратора недоступна")
+        }
         return repository.register(
             fullName = fullName.trim(),
             email = trimmedEmail.lowercase(),

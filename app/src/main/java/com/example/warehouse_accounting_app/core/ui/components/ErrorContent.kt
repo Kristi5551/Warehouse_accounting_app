@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,7 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /**
- * Экран/блок состояния ошибки: иконка + сообщение + опциональная кнопка «Повторить».
+ * Экран/блок состояния ошибки: иконка + сообщение + опциональные действия.
  */
 @Composable
 fun ErrorContent(
@@ -26,6 +27,8 @@ fun ErrorContent(
     modifier: Modifier = Modifier,
     onRetry: (() -> Unit)? = null,
     retryLabel: String = "Повторить",
+    onSecondaryAction: (() -> Unit)? = null,
+    secondaryActionLabel: String = "На главный экран",
 ) {
     Column(
         modifier = modifier
@@ -49,6 +52,11 @@ fun ErrorContent(
         if (onRetry != null) {
             Button(onClick = onRetry) {
                 Text(retryLabel)
+            }
+        }
+        if (onSecondaryAction != null) {
+            OutlinedButton(onClick = onSecondaryAction) {
+                Text(secondaryActionLabel)
             }
         }
     }
