@@ -44,21 +44,58 @@ class ProductListViewModel(
 
     private fun loadUserRole() {
         viewModelScope.launch {
+            _state.update { it.copy(isRoleLoading = true, roleErrorMessage = null) }
             when (val result = getCurrentUserUseCase()) {
-                is AppResult.Success -> currentUserRole = result.data.role
-                is AppResult.Error -> Unit
+                is AppResult.Success -> {
+                    currentUserRole = result.data.role
+                    _state.update {
+                        it.copy(
+                            isRoleLoading = false,
+                            roleErrorMessage = null,
+                            isAdminUser = result.data.role == UserRole.ADMIN,
+                        )
+                    }
+                }
+                is AppResult.Error -> {
+                    currentUserRole = null
+                    _state.update {
+                        it.copy(
+                            isRoleLoading = false,
+                            roleErrorMessage = "Не удалось определить права пользователя",
+                            isAdminUser = false,
+                        )
+                    }
+                }
             }
         }
     }
 
+    fun retryUserRole() = loadUserRole()
+
     private fun loadCategories() {
         viewModelScope.launch {
+            _state.update { it.copy(isCategoriesLoading = true, categoriesErrorMessage = null) }
             when (val result = getCategoriesUseCase()) {
-                is AppResult.Success -> _state.update { it.copy(categories = result.data) }
-                is AppResult.Error -> Unit
+                is AppResult.Success -> _state.update {
+                    it.copy(
+                        isCategoriesLoading = false,
+                        categories = result.data,
+                        categoriesErrorMessage = null,
+                    )
+                }
+                is AppResult.Error -> _state.update {
+                    it.copy(
+                        isCategoriesLoading = false,
+                        categories = emptyList(),
+                        categoriesErrorMessage = result.message.ifBlank { "Не удалось загрузить категории" },
+                        selectedCategoryId = null,
+                    )
+                }
             }
         }
     }
+
+    fun retryCategories() = loadCategories()
 
     fun loadProducts() {
         viewModelScope.launch {
@@ -87,7 +124,7 @@ class ProductListViewModel(
         }
     }
 
-    fun isAdmin() = currentUserRole == UserRole.ADMIN
+    fun isAdmin() = _state.value.isAdminUser
     fun getUserRole() = currentUserRole
     fun onCreateClick() = viewModelScope.launch { _events.send(ProductListEvent.NavigateToCreate) }
     fun onEditClick(id: Long) = viewModelScope.launch { _events.send(ProductListEvent.NavigateToEdit(id)) }

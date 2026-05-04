@@ -24,12 +24,15 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -80,6 +83,12 @@ fun ProductListScreen(
             }
         }
     }
+    LaunchedEffect(state.roleErrorMessage) {
+        state.roleErrorMessage?.let { snackbarHostState.showSnackbar(it) }
+    }
+    LaunchedEffect(state.categoriesErrorMessage) {
+        state.categoriesErrorMessage?.let { snackbarHostState.showSnackbar(it) }
+    }
 
     productToDeactivate?.let { id ->
         val p = state.products.find { it.id == id }
@@ -98,7 +107,7 @@ fun ProductListScreen(
         topBar = { AppTopBar(title = "Товары", onBack = onBack) },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            if (viewModel.isAdmin()) {
+            if (state.isAdminUser) {
                 FloatingActionButton(
                     onClick = { viewModel.onCreateClick() },
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -129,36 +138,97 @@ fun ProductListScreen(
                 Text("Только активные", style = MaterialTheme.typography.bodyMedium)
                 Switch(checked = state.activeOnly, onCheckedChange = viewModel::onActiveOnlyChange)
             }
-            if (state.categories.isNotEmpty()) {
-                Spacer(Modifier.height(4.dp))
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    item {
-                        FilterChip(
-                            selected = state.selectedCategoryId == null,
-                            onClick = { viewModel.onCategoryFilter(null) },
-                            label = { Text("Все") },
+            state.roleErrorMessage?.let { msg ->
+                Spacer(Modifier.height(8.dp))
+                Surface(
+                    color = MaterialTheme.colorScheme.errorContainer,
+                    shape = MaterialTheme.shapes.medium,
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            msg,
+                            modifier = Modifier.weight(1f),
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            style = MaterialTheme.typography.bodyMedium,
                         )
+                        TextButton(onClick = { viewModel.retryUserRole() }) {
+                            Text("Повторить")
+                        }
                     }
-                    items(state.categories) { cat ->
-                        FilterChip(
-                            selected = state.selectedCategoryId == cat.id,
-                            onClick = { viewModel.onCategoryFilter(if (state.selectedCategoryId == cat.id) null else cat.id) },
-                            label = { Text(cat.name) },
-                        )
+                }
+            }
+            when {
+                state.isCategoriesLoading && state.categories.isEmpty() && state.categoriesErrorMessage == null -> {
+                    Spacer(Modifier.height(8.dp))
+                    LinearProgressIndicator(Modifier.fillMaxWidth())
+                }
+                state.categoriesErrorMessage != null -> {
+                    Spacer(Modifier.height(8.dp))
+                    Surface(
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        shape = MaterialTheme.shapes.medium,
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(
+                                state.categoriesErrorMessage!!,
+                                modifier = Modifier.weight(1f),
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            TextButton(onClick = { viewModel.retryCategories() }) {
+                                Text("Повторить")
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Фильтр по категориям недоступен",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                state.categories.isNotEmpty() -> {
+                    Spacer(Modifier.height(4.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        item {
+                            FilterChip(
+                                selected = state.selectedCategoryId == null,
+                                onClick = { viewModel.onCategoryFilter(null) },
+                                label = { Text("Все") },
+                            )
+                        }
+                        items(state.categories) { cat ->
+                            FilterChip(
+                                selected = state.selectedCategoryId == cat.id,
+                                onClick = { viewModel.onCategoryFilter(if (state.selectedCategoryId == cat.id) null else cat.id) },
+                                label = { Text(cat.name) },
+                            )
+                        }
                     }
                 }
             }
             Spacer(Modifier.height(8.dp))
             when {
                 state.isLoading -> LoadingContent()
-                state.errorMessage != null -> ErrorContent(state.errorMessage!!)
+                state.errorMessage != null -> ErrorContent(
+                    message = state.errorMessage!!,
+                    onRetry = { viewModel.loadProducts() },
+                )
                 state.filtered.isEmpty() -> EmptyContent(if (state.searchQuery.isBlank() && state.selectedCategoryId == null) "Товаров пока нет" else "Ничего не найдено")
                 else -> {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(state.filtered, key = { it.id }) { product ->
                             ProductCard(
                                 product = product,
-                                isAdmin = viewModel.isAdmin(),
+                                isAdmin = state.isAdminUser,
                                 onClick = { viewModel.onDetailsClick(product.id) },
                                 onEdit = { viewModel.onEditClick(product.id) },
                                 onDeactivate = { productToDeactivate = product.id },

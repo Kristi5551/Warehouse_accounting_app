@@ -12,6 +12,11 @@ data class ProductListState(
     val selectedCategoryId: Long? = null,
     val activeOnly: Boolean = true,
     val errorMessage: String? = null,
+    val isRoleLoading: Boolean = false,
+    val roleErrorMessage: String? = null,
+    val isAdminUser: Boolean = false,
+    val isCategoriesLoading: Boolean = false,
+    val categoriesErrorMessage: String? = null,
 )
 
 val ProductListState.filtered: List<Product>
