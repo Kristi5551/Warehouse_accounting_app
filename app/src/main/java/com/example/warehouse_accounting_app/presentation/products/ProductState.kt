@@ -60,10 +60,11 @@ val ProductEditState.isEditMode: Boolean get() = editingProduct != null
 // ── Details ───────────────────────────────────────────────────────────────────
 
 data class ProductDetailsState(
-    val isLoading: Boolean = true,
+    val isProductLoading: Boolean = true,
     val product: Product? = null,
-    val errorMessage: String? = null,
+    val productErrorMessage: String? = null,
     val isAdmin: Boolean = false,
     val history: List<StockOperation> = emptyList(),
-    val historyLoading: Boolean = false,
+    val isHistoryLoading: Boolean = false,
+    val historyErrorMessage: String? = null,
 )

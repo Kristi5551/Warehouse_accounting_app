@@ -88,7 +88,7 @@ class RouteGuardViewModel(
             is AppError.Server ->
                 GuardState.ServerError("Ошибка сервера. Попробуйте позже")
             is AppError.Unknown, null ->
-                GuardState.UnknownError("Не удалось проверить права доступа")
+                GuardState.UnknownError("Не удалось загрузить профиль. Проверьте подключение к сети и попробуйте снова.")
         }
 }
 

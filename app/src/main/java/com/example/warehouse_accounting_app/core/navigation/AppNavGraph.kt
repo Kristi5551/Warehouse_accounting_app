@@ -16,6 +16,7 @@ import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
 import com.example.warehouse_accounting_app.domain.model.RolePermissions
 import com.example.warehouse_accounting_app.presentation.auth.login.LoginScreen
 import com.example.warehouse_accounting_app.presentation.auth.register.RegisterScreen
+import com.example.warehouse_accounting_app.core.ui.components.InvalidRouteArgumentScreen
 import com.example.warehouse_accounting_app.presentation.categories.CategoryEditScreen
 import com.example.warehouse_accounting_app.presentation.categories.CategoryListScreen
 import com.example.warehouse_accounting_app.presentation.dashboard.DashboardScreen
@@ -148,20 +149,29 @@ fun AppNavGraph(
                 )
             }
         }
-        composable(AppRoutes.CategoryEdit, arguments = listOf(navArgument("id") { type = NavType.LongType })) { back ->
-            RoleGuard(
-                viewModelFactory = viewModelFactory,
-                allowed = { RolePermissions.canEditCategories(it) },
-                onBack = { navController.popBackStack() },
-                onSessionExpired = { navController.logout() },
-            ) {
-                CategoryEditScreen(
+        composable(
+            AppRoutes.CategoryEdit,
+            arguments = listOf(navArgument("id") { type = NavType.StringType }),
+        ) { back ->
+            val raw = back.arguments?.getString("id")
+            val id = raw?.toLongOrNull()?.takeIf { it > 0 }
+            if (id == null) {
+                InvalidRouteArgumentScreen(onBack = { navController.popBackStack() })
+            } else {
+                RoleGuard(
                     viewModelFactory = viewModelFactory,
-                    categoryId = back.arguments?.getLong("id"),
-                    onSaved = { navController.popBackStack() },
+                    allowed = { RolePermissions.canEditCategories(it) },
                     onBack = { navController.popBackStack() },
                     onSessionExpired = { navController.logout() },
-                )
+                ) {
+                    CategoryEditScreen(
+                        viewModelFactory = viewModelFactory,
+                        categoryId = id,
+                        onSaved = { navController.popBackStack() },
+                        onBack = { navController.popBackStack() },
+                        onSessionExpired = { navController.logout() },
+                    )
+                }
             }
         }
 
@@ -193,29 +203,47 @@ fun AppNavGraph(
                 )
             }
         }
-        composable(AppRoutes.ProductDetails, arguments = listOf(navArgument("id") { type = NavType.LongType })) { back ->
-            ProductDetailsScreen(
-                viewModelFactory = viewModelFactory,
-                productId = back.arguments!!.getLong("id"),
-                onBack = { navController.popBackStack() },
-                onNavigateToEdit = { navController.navigate(AppRoutes.productEdit(it)) },
-                onSessionExpired = { navController.logout() },
-            )
-        }
-        composable(AppRoutes.ProductEdit, arguments = listOf(navArgument("id") { type = NavType.LongType })) { back ->
-            RoleGuard(
-                viewModelFactory = viewModelFactory,
-                allowed = { RolePermissions.canEditProducts(it) },
-                onBack = { navController.popBackStack() },
-                onSessionExpired = { navController.logout() },
-            ) {
-                ProductEditScreen(
+        composable(
+            AppRoutes.ProductDetails,
+            arguments = listOf(navArgument("id") { type = NavType.StringType }),
+        ) { back ->
+            val raw = back.arguments?.getString("id")
+            val id = raw?.toLongOrNull()?.takeIf { it > 0 }
+            if (id == null) {
+                InvalidRouteArgumentScreen(onBack = { navController.popBackStack() })
+            } else {
+                ProductDetailsScreen(
                     viewModelFactory = viewModelFactory,
-                    productId = back.arguments?.getLong("id"),
-                    onSaved = { navController.popBackStack() },
+                    productId = id,
                     onBack = { navController.popBackStack() },
+                    onNavigateToEdit = { navController.navigate(AppRoutes.productEdit(it)) },
                     onSessionExpired = { navController.logout() },
                 )
+            }
+        }
+        composable(
+            AppRoutes.ProductEdit,
+            arguments = listOf(navArgument("id") { type = NavType.StringType }),
+        ) { back ->
+            val raw = back.arguments?.getString("id")
+            val id = raw?.toLongOrNull()?.takeIf { it > 0 }
+            if (id == null) {
+                InvalidRouteArgumentScreen(onBack = { navController.popBackStack() })
+            } else {
+                RoleGuard(
+                    viewModelFactory = viewModelFactory,
+                    allowed = { RolePermissions.canEditProducts(it) },
+                    onBack = { navController.popBackStack() },
+                    onSessionExpired = { navController.logout() },
+                ) {
+                    ProductEditScreen(
+                        viewModelFactory = viewModelFactory,
+                        productId = id,
+                        onSaved = { navController.popBackStack() },
+                        onBack = { navController.popBackStack() },
+                        onSessionExpired = { navController.logout() },
+                    )
+                }
             }
         }
 

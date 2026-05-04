@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -298,6 +299,8 @@ private fun OperationHistoryCard(op: StockOperation) {
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
             Row(
@@ -308,11 +311,17 @@ private fun OperationHistoryCard(op: StockOperation) {
                     op.createdByName ?: "Пользователь #${op.createdBy}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     op.warehouseName ?: "Склад #${op.warehouseId}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
             op.comment?.takeIf { it.isNotBlank() }?.let { c ->
@@ -320,6 +329,8 @@ private fun OperationHistoryCard(op: StockOperation) {
                     "Комментарий: $c",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
             op.items.forEach { item ->
@@ -333,7 +344,13 @@ private fun OperationHistoryCard(op: StockOperation) {
 private fun ItemLine(item: StockOperationItem) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         val title = "${item.productName ?: "Товар"} (${item.productArticle ?: "—"})"
-        Text(title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+        Text(
+            title,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+        )
         val qtyPrice =
             buildString {
                 append("Кол-во: ${formatQuantity(item.quantity)}")
@@ -345,6 +362,8 @@ private fun ItemLine(item: StockOperationItem) {
                 "Причина: $r",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }

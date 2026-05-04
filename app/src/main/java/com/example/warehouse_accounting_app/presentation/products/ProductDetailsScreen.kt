@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -21,6 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -77,11 +80,13 @@ fun ProductDetailsScreen(
             )
         },
     ) { padding ->
+        val productLoadError = state.productErrorMessage
         when {
-            state.isLoading -> LoadingContent()
-            state.errorMessage != null && state.product == null ->
+            state.isProductLoading && state.product == null ->
+                LoadingContent(Modifier.padding(padding))
+            productLoadError != null && state.product == null ->
                 ErrorContent(
-                    message = state.errorMessage!!,
+                    message = productLoadError,
                     modifier = Modifier.padding(padding),
                     onRetry = { viewModel.loadProduct(productId) },
                 )
@@ -91,14 +96,17 @@ fun ProductDetailsScreen(
                         .fillMaxSize()
                         .padding(padding)
                         .padding(horizontal = 16.dp)
-                        .verticalScroll(rememberScrollState()),
+                        .verticalScroll(rememberScrollState())
+                        .imePadding(),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Spacer(Modifier.height(4.dp))
                     ProductInfoCard(state.product!!)
                     ProductHistorySection(
                         history = state.history,
-                        isLoading = state.historyLoading,
+                        isLoading = state.isHistoryLoading,
+                        historyErrorMessage = state.historyErrorMessage,
+                        onRetryHistory = { viewModel.retryHistory() },
                     )
                     Spacer(Modifier.height(24.dp))
                 }
@@ -122,6 +130,8 @@ private fun ProductInfoCard(product: Product) {
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f),
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     if (product.isActive) "Активен" else "Неактивен",
@@ -147,8 +157,18 @@ private fun DetailRow(label: String, value: String) {
             label,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(0.45f),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
         )
-        Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+        Text(
+            value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.weight(0.55f),
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -156,6 +176,8 @@ private fun DetailRow(label: String, value: String) {
 private fun ProductHistorySection(
     history: List<StockOperation>,
     isLoading: Boolean,
+    historyErrorMessage: String?,
+    onRetryHistory: () -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -172,6 +194,16 @@ private fun ProductHistorySection(
             )
             HorizontalDivider()
             when {
+                historyErrorMessage != null -> {
+                    Text(
+                        historyErrorMessage,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                    Button(onClick = onRetryHistory, modifier = Modifier.fillMaxWidth()) {
+                        Text("Повторить")
+                    }
+                }
                 isLoading -> {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
@@ -182,7 +214,7 @@ private fun ProductHistorySection(
                 }
                 history.isEmpty() -> {
                     Text(
-                        "Операций пока нет",
+                        "История операций по товару отсутствует",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(vertical = 4.dp),
@@ -217,18 +249,23 @@ private fun HistoryRow(op: StockOperation) {
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Medium,
                 color = op.operationType.tint(),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
             val qty = op.items.sumOf { it.quantity }
             Text(
                 if (qty % 1.0 == 0.0) qty.toLong().toString() else "%.3f".format(qty),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
         }
         Text(
             op.createdAt.take(10),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
         )
     }
 }

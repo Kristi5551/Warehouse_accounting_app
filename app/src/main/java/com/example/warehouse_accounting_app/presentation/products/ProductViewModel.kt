@@ -13,6 +13,7 @@ import com.example.warehouse_accounting_app.domain.usecase.product.DeleteProduct
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductDetailsUseCase
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductsUseCase
 import com.example.warehouse_accounting_app.domain.usecase.product.UpdateProductUseCase
+import com.example.warehouse_accounting_app.core.network.ApiException
 import com.example.warehouse_accounting_app.domain.usecase.stock.GetProductHistoryUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -147,27 +148,73 @@ class ProductDetailsViewModel(
     private val _state = MutableStateFlow(ProductDetailsState())
     val state = _state.asStateFlow()
 
+    private fun userVisibleProductError(r: AppResult.Error): String {
+        val t = r.throwable
+        if (t is ApiException && t.statusCode == 404) return "Запись не найдена"
+        return r.message.ifBlank { "Не удалось загрузить товар" }
+    }
+
     fun loadProduct(productId: Long) {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            _state.update {
+                it.copy(
+                    isProductLoading = true,
+                    product = null,
+                    productErrorMessage = null,
+                    history = emptyList(),
+                    historyErrorMessage = null,
+                    isHistoryLoading = false,
+                )
+            }
             val isAdmin = (getCurrentUserUseCase() as? AppResult.Success)?.data?.role == UserRole.ADMIN
             when (val r = getProductDetailsUseCase(productId)) {
                 is AppResult.Success -> {
-                    _state.update { it.copy(isLoading = false, product = r.data, isAdmin = isAdmin) }
-                    loadHistory(productId)
+                    _state.update {
+                        it.copy(
+                            isProductLoading = false,
+                            product = r.data,
+                            productErrorMessage = null,
+                            isAdmin = isAdmin,
+                        )
+                    }
+                    loadHistoryInternal(productId)
                 }
-                is AppResult.Error -> _state.update { it.copy(isLoading = false, errorMessage = r.message) }
+                is AppResult.Error ->
+                    _state.update {
+                        it.copy(
+                            isProductLoading = false,
+                            productErrorMessage = userVisibleProductError(r),
+                            product = null,
+                            isAdmin = isAdmin,
+                        )
+                    }
             }
         }
     }
 
-    private fun loadHistory(productId: Long) {
-        viewModelScope.launch {
-            _state.update { it.copy(historyLoading = true) }
-            when (val r = getProductHistoryUseCase(productId, StockHistoryFilter())) {
-                is AppResult.Success -> _state.update { it.copy(historyLoading = false, history = r.data.take(10)) }
-                is AppResult.Error -> _state.update { it.copy(historyLoading = false) }
-            }
+    fun retryHistory() {
+        val id = _state.value.product?.id ?: return
+        viewModelScope.launch { loadHistoryInternal(id) }
+    }
+
+    private suspend fun loadHistoryInternal(productId: Long) {
+        _state.update { it.copy(isHistoryLoading = true, historyErrorMessage = null) }
+        when (val r = getProductHistoryUseCase(productId, StockHistoryFilter())) {
+            is AppResult.Success ->
+                _state.update {
+                    it.copy(
+                        isHistoryLoading = false,
+                        history = r.data.take(10),
+                        historyErrorMessage = null,
+                    )
+                }
+            is AppResult.Error ->
+                _state.update {
+                    it.copy(
+                        isHistoryLoading = false,
+                        historyErrorMessage = "Не удалось загрузить историю товара",
+                    )
+                }
         }
     }
 }
@@ -214,7 +261,15 @@ class ProductEditViewModel(
                         )
                     }
                 }
-                is AppResult.Error -> _state.update { it.copy(isLoading = false, errorMessage = r.message) }
+                is AppResult.Error -> {
+                    val msg =
+                        when {
+                            r.throwable is ApiException && (r.throwable as ApiException).statusCode == 404 ->
+                                "Запись не найдена"
+                            else -> r.message
+                        }
+                    _state.update { it.copy(isLoading = false, errorMessage = msg) }
+                }
             }
         }
     }
