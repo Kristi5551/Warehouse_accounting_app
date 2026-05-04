@@ -90,14 +90,30 @@ class AuthRepositoryImpl(
             AppResult.Success(api.me().toDomain())
         } catch (e: ApiException) {
             logApiException(e, "GET /api/auth/me")
-            if (e.statusCode == 401 || e.statusCode == 403) {
-                authDataStore.clearToken()
-                api.clearCachedAuthTokens()
-                val msg = e.message ?: "Сессия истекла. Войдите снова."
-                AppResult.Error(msg, e, appError = AppError.Unauthorized(msg))
-            } else {
-                val msg = e.message ?: "Ошибка сервера"
-                AppResult.Error(msg, e, appError = AppError.Server(msg))
+            val msg = e.message ?: "Не удалось получить данные пользователя"
+            when (e.statusCode) {
+                401 -> {
+                    authDataStore.clearToken()
+                    api.clearCachedAuthTokens()
+                    AppResult.Error(
+                        message = if (msg.isNotBlank()) msg else "Сессия истекла. Войдите снова.",
+                        throwable = e,
+                        appError = AppError.SessionExpired(msg.ifBlank { "Сессия истекла. Войдите снова." }),
+                    )
+                }
+                403 -> {
+                    if (msg.meansAccountNoLongerActiveForSession()) {
+                        authDataStore.clearToken()
+                        api.clearCachedAuthTokens()
+                        AppResult.Error(msg, e, appError = AppError.SessionExpired(msg))
+                    } else {
+                        AppResult.Error(msg, e, appError = AppError.Forbidden(msg))
+                    }
+                }
+                in 500..599 ->
+                    AppResult.Error(msg, e, appError = AppError.Server(msg))
+                else ->
+                    AppResult.Error(msg, e, appError = AppError.Unknown(msg))
             }
         } catch (e: IOException) {
             logNetworkFailure(e, "GET /api/auth/me")

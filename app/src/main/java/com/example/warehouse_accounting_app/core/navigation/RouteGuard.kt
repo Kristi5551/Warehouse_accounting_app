@@ -35,7 +35,11 @@ sealed interface GuardState {
     /** Профиль загружен; отказ в доступе — только если [RoleGuard] не пропускает роль. */
     data class Loaded(val role: UserRole) : GuardState
 
+    /** 401 или закрытая учётная запись на /me — токен очищен в репозитории. */
     data object Unauthorized : GuardState
+
+    /** /me вернул 403 без признаков «конец сессии» — токен сохранён (редкий случай). */
+    data class ProfileAccessDenied(val message: String) : GuardState
 
     data class NetworkError(val message: String) : GuardState
 
@@ -77,7 +81,8 @@ class RouteGuardViewModel(
 
     private fun mapError(r: AppResult.Error): GuardState =
         when (r.appError) {
-            is AppError.Unauthorized -> GuardState.Unauthorized
+            is AppError.SessionExpired, is AppError.Unauthorized -> GuardState.Unauthorized
+            is AppError.Forbidden -> GuardState.ProfileAccessDenied(r.message)
             is AppError.Network ->
                 GuardState.NetworkError("Нет соединения с сервером")
             is AppError.Server ->
@@ -95,7 +100,8 @@ class RouteGuardViewModel(
  * - Пока роль загружается — [LoadingContent].
  * - Успех и [allowed] — [content].
  * - Успех, но роль не подходит — [AccessDeniedScreen].
- * - 401/403 по /me — [SessionExpiredScreen] (токен уже очищен в репозитории), затем [onSessionExpired].
+ * - 401 или «конец сессии» по /me — [SessionExpiredScreen] (токен уже очищен), затем [onSessionExpired].
+ * - Прочий 403 по /me — сообщение об ошибке, токен сохранён, можно [retry].
  * - Сеть / сервер / прочее — [ErrorContent] с понятными сообщениями.
  *
  * @param onSessionExpired перейти на экран входа и сбросить стек (например [NavHostController.logout]).
@@ -114,6 +120,15 @@ fun RoleGuard(
     when (val s = state) {
         GuardState.Loading -> LoadingContent()
         GuardState.Unauthorized -> SessionExpiredScreen(onGoToLogin = onSessionExpired)
+        is GuardState.ProfileAccessDenied ->
+            GuardErrorScaffold(title = "Доступ", onBack = onBack) {
+                ErrorContent(
+                    message = s.message,
+                    onRetry = { vm.retry() },
+                    onSecondaryAction = onBack,
+                    secondaryActionLabel = "Вернуться",
+                )
+            }
         is GuardState.NetworkError ->
             GuardErrorScaffold(title = "Нет связи", onBack = onBack) {
                 ErrorContent(

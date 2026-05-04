@@ -30,16 +30,19 @@ class DashboardViewModel(
                 is AppResult.Success ->
                     _state.update { it.copy(user = result.data, isLoading = false, errorMessage = null) }
                 is AppResult.Error -> {
-                    if (result.appError is AppError.Unauthorized) {
-                        logoutUseCase()
-                        _state.update { it.copy(isLoading = false, sessionExpired = true) }
-                    } else {
-                        _state.update {
-                            it.copy(
-                                user = null,
-                                isLoading = false,
-                                errorMessage = result.message,
-                            )
+                    when (result.appError) {
+                        is AppError.SessionExpired, is AppError.Unauthorized -> {
+                            logoutUseCase()
+                            _state.update { it.copy(isLoading = false, sessionExpired = true) }
+                        }
+                        else -> {
+                            _state.update {
+                                it.copy(
+                                    user = null,
+                                    isLoading = false,
+                                    errorMessage = result.message,
+                                )
+                            }
                         }
                     }
                 }

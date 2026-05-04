@@ -6,8 +6,22 @@ package com.example.warehouse_accounting_app.domain.result
  * в слои domain и presentation без утечки транспортных деталей.
  */
 sealed class AppError(open val message: String) {
-    /** Сервер вернул 401 или 403 — сессия недействительна или доступ запрещён. */
+    /**
+     * 401 или иная ситуация, когда с точки зрения приложения нужен новый вход.
+     * Для [AuthRepository.getCurrentUser] предпочтительнее [SessionExpired], если токен уже очищен.
+     */
     data class Unauthorized(override val message: String) : AppError(message)
+
+    /**
+     * Недействительный/просроченный токен либо учётная запись больше не может использоваться (типично 401 или 403 на /me).
+     * Репозиторий при этом уже может очистить токен.
+     */
+    data class SessionExpired(override val message: String) : AppError(message)
+
+    /**
+     * 403 без признаков «сессия мёртва»: токен не очищается автоматически (например нестандартный ответ /me).
+     */
+    data class Forbidden(override val message: String) : AppError(message)
 
     /** Сеть недоступна, таймаут, хост не найден. */
     data class Network(override val message: String) : AppError(message)
