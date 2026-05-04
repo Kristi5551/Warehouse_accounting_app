@@ -20,7 +20,7 @@ import com.example.warehouse_accounting_app.presentation.stock.balances.LowStock
 import com.example.warehouse_accounting_app.presentation.stock.balances.StockBalanceViewModel
 import com.example.warehouse_accounting_app.presentation.stock.receipt.ReceiptViewModel
 import com.example.warehouse_accounting_app.presentation.stock.writeoff.WriteOffViewModel
-import com.example.warehouse_accounting_app.core.navigation.RouteGuardViewModel
+import com.example.warehouse_accounting_app.presentation.access.RouteGuardViewModel
 import com.example.warehouse_accounting_app.presentation.users.UserListViewModel
 
 class WarehouseViewModelFactory(private val container: AppContainer) : ViewModelProvider.Factory {

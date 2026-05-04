@@ -131,4 +131,6 @@ class AuthRepositoryImpl(
     }
 
     override fun observeToken(): Flow<String?> = authDataStore.observeToken()
+
+    override suspend fun getTokenOnce(): String? = authDataStore.getTokenOnce()
 }

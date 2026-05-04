@@ -17,4 +17,7 @@ interface AuthRepository {
     suspend fun getCurrentUser(): AppResult<User>
     suspend fun logout()
     fun observeToken(): Flow<String?>
+
+    /** Однократное чтение токена без подписки на Flow. */
+    suspend fun getTokenOnce(): String?
 }

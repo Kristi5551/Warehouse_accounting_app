@@ -3,7 +3,6 @@ package com.example.warehouse_accounting_app.domain.usecase.auth
 import com.example.warehouse_accounting_app.domain.result.AppError
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.repository.AuthRepository
-import kotlinx.coroutines.flow.first
 
 /**
  * Проверяет, авторизован ли пользователь при старте приложения.
@@ -23,7 +22,7 @@ class CheckAuthStateUseCase(
     private val repository: AuthRepository,
 ) {
     suspend operator fun invoke(): AuthCheckResult {
-        val token = repository.observeToken().first()
+        val token = repository.getTokenOnce()
         if (token.isNullOrBlank()) return AuthCheckResult.Unauthenticated
 
         return when (val result = repository.getCurrentUser()) {
