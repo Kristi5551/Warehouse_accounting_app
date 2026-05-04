@@ -1,5 +1,8 @@
 import java.util.Properties
 
+private fun String.escapeForBuildConfigString(): String =
+    replace("\\", "\\\\").replace("\"", "\\\"")
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -19,20 +22,31 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
 
+    fun loadLocalProperties(): Properties {
         val props = Properties()
         rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { props.load(it) }
-        val apiBase = props.getProperty("api.base.url", "http://10.0.2.2:8080").trim()
-        buildConfigField("String", "API_BASE_URL", "\"$apiBase\"")
+        return props
     }
 
     buildTypes {
+        debug {
+            manifestPlaceholders["usesCleartextTraffic"] = "true"
+            val props = loadLocalProperties()
+            val apiBase = props.getProperty("api.base.url", "http://10.0.2.2:8080").trim()
+            buildConfigField("String", "API_BASE_URL", "\"${apiBase.escapeForBuildConfigString()}\"")
+        }
         release {
+            manifestPlaceholders["usesCleartextTraffic"] = "false"
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            val props = loadLocalProperties()
+            val apiBase = props.getProperty("api.base.url", "").trim()
+            buildConfigField("String", "API_BASE_URL", "\"${apiBase.escapeForBuildConfigString()}\"")
         }
     }
     compileOptions {
@@ -79,4 +93,23 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+val validateReleaseApiBaseUrl by tasks.registering {
+    doLast {
+        val props = Properties()
+        rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { props.load(it) }
+        val apiBase = props.getProperty("api.base.url", "").trim()
+        require(apiBase.isNotEmpty()) {
+            "Release build: set api.base.url in local.properties to your HTTPS API base URL " +
+                "(cleartext HTTP is disabled for release)."
+        }
+        require(apiBase.startsWith("https://", ignoreCase = true)) {
+            "Release build: api.base.url must use HTTPS (cleartext is off). Current value: $apiBase"
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.named("preReleaseBuild").configure { dependsOn(validateReleaseApiBaseUrl) }
 }
