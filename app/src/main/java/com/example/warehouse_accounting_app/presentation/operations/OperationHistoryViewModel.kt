@@ -2,6 +2,7 @@ package com.example.warehouse_accounting_app.presentation.operations
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.warehouse_accounting_app.core.util.IsoCalendarDateQuery
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.repository.OperationsFilter
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductsUseCase
@@ -60,6 +61,10 @@ class OperationHistoryViewModel(
         viewModelScope.launch {
             val s = _state.value
             _state.update { it.copy(isLoading = true, errorMessage = null) }
+            IsoCalendarDateQuery.validationMessage(s.dateFromInput, s.dateToInput)?.let { msg ->
+                _state.update { it.copy(isLoading = false, errorMessage = msg) }
+                return@launch
+            }
             val filter =
                 OperationsFilter(
                     type = s.typeFilter,

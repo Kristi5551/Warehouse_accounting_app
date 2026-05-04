@@ -2,6 +2,7 @@ package com.example.warehouse_accounting_app.presentation.reports
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.warehouse_accounting_app.core.util.IsoCalendarDateQuery
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.reports.LowStockReport
 import com.example.warehouse_accounting_app.domain.model.reports.OperationsReport
@@ -45,14 +46,19 @@ class ReportsViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
             val s = _state.value
+            val dateErr = IsoCalendarDateQuery.validationMessage(s.dateFromInput, s.dateToInput)
             val summaryD = async { getStockSummaryUseCase(null) }
             val lowD = async { getLowStockReportUseCase(null) }
             val valueD = async { getStockValueReportUseCase(null) }
             val opsD = async {
-                getOperationsReportUseCase(
-                    s.dateFromInput.trim().takeIf { it.isNotEmpty() },
-                    s.dateToInput.trim().takeIf { it.isNotEmpty() },
-                )
+                if (dateErr != null) {
+                    AppResult.Error(dateErr)
+                } else {
+                    getOperationsReportUseCase(
+                        s.dateFromInput.trim().takeIf { it.isNotEmpty() },
+                        s.dateToInput.trim().takeIf { it.isNotEmpty() },
+                    )
+                }
             }
             mergeResults(summaryD.await(), lowD.await(), opsD.await(), valueD.await())
         }
@@ -62,6 +68,10 @@ class ReportsViewModel(
         viewModelScope.launch {
             val s = _state.value
             _state.update { it.copy(isLoading = true, errorMessage = null) }
+            IsoCalendarDateQuery.validationMessage(s.dateFromInput, s.dateToInput)?.let { msg ->
+                _state.update { it.copy(isLoading = false, errorMessage = msg) }
+                return@launch
+            }
             when (
                 val opsR =
                     getOperationsReportUseCase(
