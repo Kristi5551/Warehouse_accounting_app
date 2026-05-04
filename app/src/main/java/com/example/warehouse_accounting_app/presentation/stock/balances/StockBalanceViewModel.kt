@@ -2,7 +2,7 @@ package com.example.warehouse_accounting_app.presentation.stock.balances
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.warehouse_accounting_app.core.result.AppResult
+import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.StockStatus
 import com.example.warehouse_accounting_app.domain.usecase.stock.GetStockBalancesUseCase
 import kotlinx.coroutines.Job

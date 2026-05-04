@@ -1,6 +1,6 @@
 package com.example.warehouse_accounting_app.domain.repository
 
-import com.example.warehouse_accounting_app.core.result.AppResult
+import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.reports.LowStockReport
 import com.example.warehouse_accounting_app.domain.model.reports.OperationsReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockSummaryReport

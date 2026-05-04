@@ -1,4 +1,4 @@
-package com.example.warehouse_accounting_app.core.result
+package com.example.warehouse_accounting_app.domain.result
 
 sealed class AppResult<out T> {
     data class Success<T>(val data: T) : AppResult<T>()

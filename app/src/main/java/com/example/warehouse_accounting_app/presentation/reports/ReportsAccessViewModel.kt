@@ -2,7 +2,7 @@ package com.example.warehouse_accounting_app.presentation.reports
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.warehouse_accounting_app.core.result.AppResult
+import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.UserRole
 import com.example.warehouse_accounting_app.domain.usecase.auth.GetCurrentUserUseCase
 import kotlinx.coroutines.flow.MutableStateFlow

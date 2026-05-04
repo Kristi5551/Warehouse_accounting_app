@@ -12,8 +12,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
-import com.example.warehouse_accounting_app.core.result.AppError
-import com.example.warehouse_accounting_app.core.result.AppResult
+import com.example.warehouse_accounting_app.domain.result.AppError
+import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.core.ui.components.AccessDeniedScreen
 import com.example.warehouse_accounting_app.core.ui.components.AppScaffold
 import com.example.warehouse_accounting_app.core.ui.components.AppTopBar

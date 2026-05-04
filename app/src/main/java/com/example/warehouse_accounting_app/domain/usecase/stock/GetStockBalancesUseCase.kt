@@ -1,6 +1,6 @@
-﻿package com.example.warehouse_accounting_app.domain.usecase.stock
+package com.example.warehouse_accounting_app.domain.usecase.stock
 
-import com.example.warehouse_accounting_app.core.result.AppResult
+import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.StockBalance
 import com.example.warehouse_accounting_app.domain.model.StockStatus
 import com.example.warehouse_accounting_app.domain.repository.StockRepository

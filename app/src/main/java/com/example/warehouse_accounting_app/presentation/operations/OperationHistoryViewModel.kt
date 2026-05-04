@@ -2,7 +2,7 @@ package com.example.warehouse_accounting_app.presentation.operations
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.warehouse_accounting_app.core.result.AppResult
+import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.repository.OperationsFilter
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductsUseCase
 import com.example.warehouse_accounting_app.domain.usecase.stock.GetOperationHistoryUseCase

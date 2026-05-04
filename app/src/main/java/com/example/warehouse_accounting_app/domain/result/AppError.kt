@@ -1,4 +1,4 @@
-package com.example.warehouse_accounting_app.core.result
+package com.example.warehouse_accounting_app.domain.result
 
 /**
  * Доменная классификация ошибок — без зависимостей от сетевого слоя.

@@ -1,7 +1,7 @@
 package com.example.warehouse_accounting_app.domain.usecase.auth
 
-import com.example.warehouse_accounting_app.core.result.AppError
-import com.example.warehouse_accounting_app.core.result.AppResult
+import com.example.warehouse_accounting_app.domain.result.AppError
+import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.first
 
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.first
  * 5. Сетевая ошибка — [AuthCheckResult.NetworkError] (НЕ считаем авторизованным).
  * 6. Прочая ошибка — [AuthCheckResult.UnknownError] (НЕ считаем авторизованным).
  *
- * Зависимости: только domain-репозиторий + core.result — без core.network.
+ * Зависимости: только domain-репозиторий + domain.result — без core.network.
  */
 class CheckAuthStateUseCase(
     private val repository: AuthRepository,

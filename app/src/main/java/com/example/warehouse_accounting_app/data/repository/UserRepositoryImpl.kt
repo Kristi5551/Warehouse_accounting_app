@@ -5,7 +5,7 @@ import com.example.warehouse_accounting_app.core.network.ApiException
 import com.example.warehouse_accounting_app.core.network.connectivityMessage
 import com.example.warehouse_accounting_app.core.network.logApiException
 import com.example.warehouse_accounting_app.core.network.logNetworkFailure
-import com.example.warehouse_accounting_app.core.result.AppResult
+import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.data.mapper.toDomain
 import com.example.warehouse_accounting_app.data.mapper.toUserPick
 import com.example.warehouse_accounting_app.data.remote.api.UserApi
