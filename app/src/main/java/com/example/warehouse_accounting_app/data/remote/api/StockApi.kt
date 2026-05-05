@@ -39,6 +39,7 @@ class StockApi(private val client: HttpClient, private val json: Json) {
         return r.body()
     }
 
+    /** Операционный список низких остатков: `GET /api/stock/low` → [StockBalanceResponseDto]. */
     suspend fun getLowStock(): List<StockBalanceResponseDto> {
         val r = client.get(AppConfig.url("api/stock/low"))
         if (!r.status.isSuccess()) throw parseError(r.status.value, r.bodyAsText())

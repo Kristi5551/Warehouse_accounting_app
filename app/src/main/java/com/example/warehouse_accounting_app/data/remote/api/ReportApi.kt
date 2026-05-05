@@ -27,6 +27,7 @@ class ReportApi(private val client: HttpClient, private val json: Json) {
         return r.body()
     }
 
+    /** Отчётные строки по низким остаткам: `GET /api/reports/low-stock` → [LowStockReportResponseDto]. */
     suspend fun getLowStockReport(warehouseId: Long?): List<LowStockReportResponseDto> {
         val url = AppConfig.url("api/reports/low-stock") + (warehouseId?.let { "?warehouseId=$it" } ?: "")
         val r = client.get(url)
