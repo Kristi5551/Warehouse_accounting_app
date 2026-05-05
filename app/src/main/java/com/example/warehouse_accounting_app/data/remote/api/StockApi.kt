@@ -46,6 +46,10 @@ class StockApi(private val client: HttpClient, private val json: Json) {
         return r.body()
     }
 
+    /**
+     * `GET /api/operations` — **dateFrom** / **dateTo** в `yyyy-MM-dd`, если заданы.
+     * Семантика периода совпадает с отчётом (см. `API_DATE_RANGE.md` на сервере).
+     */
     suspend fun getOperations(
         type: String?,
         productId: Long?,
@@ -66,6 +70,7 @@ class StockApi(private val client: HttpClient, private val json: Json) {
         return r.body()
     }
 
+    /** `GET /api/stock/products/{id}/history` — те же **dateFrom** / **dateTo** в `yyyy-MM-dd`. */
     suspend fun getProductHistory(
         productId: Long,
         operationType: String?,
