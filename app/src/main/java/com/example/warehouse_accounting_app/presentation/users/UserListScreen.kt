@@ -116,30 +116,40 @@ fun UserListScreen(
                 }
             }
 
-            state.errorMessage?.let { msg ->
-                ErrorContent(msg)
-            }
-
             when {
                 state.isLoading -> LoadingContent()
+                state.errorMessage != null && state.users.isEmpty() ->
+                    ErrorContent(
+                        message = state.errorMessage!!,
+                        onRetry = { viewModel.onEvent(UserListEvent.Refresh) },
+                    )
                 state.users.isEmpty() -> EmptyContent("Пользователи не найдены")
-                else -> LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    items(state.users, key = { it.id }) { user ->
-                        UserCard(
-                            user = user,
-                            currentUserId = state.currentUserId,
-                            enabled = !state.actionInProgress,
-                            onApprove = { viewModel.onEvent(UserListEvent.Approve(user.id)) },
-                            onBlock = { viewModel.onEvent(UserListEvent.Block(user.id)) },
-                            onUnblock = { viewModel.onEvent(UserListEvent.Unblock(user.id)) },
-                            onChangeRole = { viewModel.onEvent(UserListEvent.OpenRoleDialog(user.id)) },
-                        )
+                else ->
+                    Column {
+                        state.errorMessage?.let { msg ->
+                            ErrorContent(
+                                message = msg,
+                                onRetry = { viewModel.onEvent(UserListEvent.Refresh) },
+                            )
+                        }
+                        LazyColumn(
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            items(state.users, key = { it.id }) { user ->
+                                UserCard(
+                                    user = user,
+                                    currentUserId = state.currentUserId,
+                                    enabled = !state.actionInProgress,
+                                    onApprove = { viewModel.onEvent(UserListEvent.Approve(user.id)) },
+                                    onBlock = { viewModel.onEvent(UserListEvent.Block(user.id)) },
+                                    onUnblock = { viewModel.onEvent(UserListEvent.Unblock(user.id)) },
+                                    onChangeRole = { viewModel.onEvent(UserListEvent.OpenRoleDialog(user.id)) },
+                                )
+                            }
+                            item { Spacer(Modifier.height(16.dp)) }
+                        }
                     }
-                    item { Spacer(Modifier.height(16.dp)) }
-                }
             }
         }
     }

@@ -128,7 +128,10 @@ fun CategoryListScreen(
 
             when {
                 state.isLoading -> LoadingContent()
-                state.errorMessage != null -> ErrorContent(state.errorMessage!!)
+                state.errorMessage != null -> ErrorContent(
+                    message = state.errorMessage!!,
+                    onRetry = { viewModel.loadCategories() },
+                )
                 state.filtered.isEmpty() -> EmptyContent(
                     if (state.searchQuery.isBlank()) "Категорий пока нет"
                     else "Ничего не найдено",

@@ -141,7 +141,10 @@ fun StockBalanceScreen(
             when {
                 state.isLoading && state.balances.isEmpty() -> LoadingContent()
                 state.errorMessage != null && state.balances.isEmpty() ->
-                    ErrorContent(state.errorMessage!!)
+                    ErrorContent(
+                        message = state.errorMessage!!,
+                        onRetry = { viewModel.onEvent(StockBalanceEvent.Refresh) },
+                    )
                 state.balances.isEmpty() ->
                     EmptyContent("Остатки не найдены")
                 else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -195,7 +198,10 @@ fun LowStockScreen(
             when {
                 state.isLoading && state.balances.isEmpty() -> LoadingContent()
                 state.errorMessage != null && state.balances.isEmpty() ->
-                    ErrorContent(state.errorMessage!!)
+                    ErrorContent(
+                        message = state.errorMessage!!,
+                        onRetry = { viewModel.onEvent(StockBalanceEvent.Refresh) },
+                    )
                 list.isEmpty() ->
                     EmptyContent("Остатки не найдены")
                 else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
