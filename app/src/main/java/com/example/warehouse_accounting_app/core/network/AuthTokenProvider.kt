@@ -1,5 +1,5 @@
 package com.example.warehouse_accounting_app.core.network
 
-fun interface AuthTokenProvider {
+fun interface gAuthTokenProvider {
     suspend fun getToken(): String?
 }

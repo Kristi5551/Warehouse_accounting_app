@@ -198,6 +198,7 @@ private fun buildSections(role: UserRole): List<DashboardSection> = buildList {
             add(DashboardSection(AppRoutes.Categories, "Категории", "Группы товаров", Icons.Filled.Category))
             add(DashboardSection(AppRoutes.Products, "Товары", "Каталог товаров", Icons.Filled.Inventory))
             add(DashboardSection(AppRoutes.StockBalances, "Остатки", "Текущее количество товаров на складе", Icons.Filled.Warehouse))
+            add(DashboardSection(AppRoutes.LowStock, "Низкие остатки", "Товары, которые нужно пополнить", Icons.AutoMirrored.Filled.TrendingDown))
             add(DashboardSection(AppRoutes.Receipt, "Приход", "Поступление товаров на склад", Icons.Filled.MoveToInbox))
             add(DashboardSection(AppRoutes.Issue, "Расход", "Выдача или продажа товаров", Icons.Filled.Output))
             add(DashboardSection(AppRoutes.WriteOff, "Списание", "Учёт брака и потерь", Icons.Filled.DeleteForever))

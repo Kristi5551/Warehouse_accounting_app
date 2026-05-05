@@ -35,9 +35,9 @@ object RolePermissions {
     /** Общие остатки — все роли. */
     fun canOpenStockBalances(role: UserRole): Boolean = true
 
-    /** Раздел «Низкие остатки» — аналитика для ADMIN и MANAGER. */
+    /** Раздел «Низкие остатки» (GET /api/stock/low) — ADMIN, STOREKEEPER, MANAGER. */
     fun canOpenLowStock(role: UserRole): Boolean =
-        role == UserRole.ADMIN || role == UserRole.MANAGER
+        role == UserRole.ADMIN || role == UserRole.STOREKEEPER || role == UserRole.MANAGER
 
     /** Складские операции (приход/расход/списание/инвентаризация) — ADMIN и STOREKEEPER. */
     fun canCreateStockOperations(role: UserRole): Boolean =

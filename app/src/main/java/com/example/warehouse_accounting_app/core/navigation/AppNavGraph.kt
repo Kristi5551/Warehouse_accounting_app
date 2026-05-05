@@ -253,7 +253,7 @@ fun AppNavGraph(
             StockBalanceScreen(viewModelFactory = viewModelFactory, onBack = { navController.popBackStack() })
         }
 
-        // Низкие остатки — только ADMIN и MANAGER
+        // Низкие остатки — ADMIN, STOREKEEPER, MANAGER (отчёты /api/reports/* — отдельно)
         composable(AppRoutes.LowStock) {
             RoleGuard(
                 viewModelFactory = viewModelFactory,

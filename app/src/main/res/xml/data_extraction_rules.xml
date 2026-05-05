@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data-extraction-rules>
+    <!--
+      AuthDataStore: preferencesDataStore(name = "auth") → файл на диске: datastore/auth.preferences_pb
+      (относительно getFilesDir()). JWT не должен уезжать в облачный бэкап и при переносе на новое устройство.
+    -->
     <cloud-backup>
-        <!-- preferencesDataStore(name = "auth") in AuthDataStore — JWT -->
         <exclude domain="file" path="datastore/auth.preferences_pb" />
     </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="datastore/auth.preferences_pb" />
+    </device-transfer>
 </data-extraction-rules>
