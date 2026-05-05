@@ -32,13 +32,14 @@ android {
 
     buildTypes {
         debug {
-            manifestPlaceholders["usesCleartextTraffic"] = "true"
+            // HTTP к эмулятору (10.0.2.2) и локальному серверу; в release cleartext отключён
+            manifestPlaceholders["cleartextTraffic"] = "true"
             val props = loadLocalProperties()
             val apiBase = props.getProperty("api.base.url", "http://10.0.2.2:8080").trim()
             buildConfigField("String", "API_BASE_URL", "\"${apiBase.escapeForBuildConfigString()}\"")
         }
         release {
-            manifestPlaceholders["usesCleartextTraffic"] = "false"
+            manifestPlaceholders["cleartextTraffic"] = "false"
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
