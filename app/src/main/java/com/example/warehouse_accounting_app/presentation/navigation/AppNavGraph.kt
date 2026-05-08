@@ -1,4 +1,4 @@
-﻿package com.example.warehouse_accounting_app.core.navigation
+package com.example.warehouse_accounting_app.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,11 +12,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.warehouse_accounting_app.core.navigation.AppRoutes
+import com.example.warehouse_accounting_app.core.ui.components.InvalidRouteArgumentScreen
 import com.example.warehouse_accounting_app.di.WarehouseViewModelFactory
 import com.example.warehouse_accounting_app.domain.model.RolePermissions
 import com.example.warehouse_accounting_app.presentation.auth.login.LoginScreen
 import com.example.warehouse_accounting_app.presentation.auth.register.RegisterScreen
-import com.example.warehouse_accounting_app.core.ui.components.InvalidRouteArgumentScreen
 import com.example.warehouse_accounting_app.presentation.categories.CategoryEditScreen
 import com.example.warehouse_accounting_app.presentation.categories.CategoryListScreen
 import com.example.warehouse_accounting_app.presentation.dashboard.DashboardScreen
@@ -29,10 +30,10 @@ import com.example.warehouse_accounting_app.presentation.reports.ReportsScreen
 import com.example.warehouse_accounting_app.presentation.splash.SplashDestination
 import com.example.warehouse_accounting_app.presentation.splash.SplashScreenContent
 import com.example.warehouse_accounting_app.presentation.splash.SplashViewModel
-import com.example.warehouse_accounting_app.presentation.stock.inventory.InventoryScreen
-import com.example.warehouse_accounting_app.presentation.stock.issue.IssueScreen
 import com.example.warehouse_accounting_app.presentation.stock.balances.LowStockScreen
 import com.example.warehouse_accounting_app.presentation.stock.balances.StockBalanceScreen
+import com.example.warehouse_accounting_app.presentation.stock.inventory.InventoryScreen
+import com.example.warehouse_accounting_app.presentation.stock.issue.IssueScreen
 import com.example.warehouse_accounting_app.presentation.stock.receipt.ReceiptScreen
 import com.example.warehouse_accounting_app.presentation.stock.writeoff.WriteOffScreen
 import com.example.warehouse_accounting_app.presentation.users.UserListScreen

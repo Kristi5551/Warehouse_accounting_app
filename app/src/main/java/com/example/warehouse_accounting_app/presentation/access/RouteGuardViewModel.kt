@@ -33,7 +33,7 @@ sealed interface GuardState {
 
 /**
  * ViewModel для проверки актуальной роли ([GET /api/auth/me]) перед открытием экрана.
- * Используется в [com.example.warehouse_accounting_app.core.navigation.RoleGuard].
+ * Используется в [com.example.warehouse_accounting_app.presentation.navigation.RoleGuard].
  */
 class RouteGuardViewModel(
     private val getCurrentUser: GetCurrentUserUseCase,

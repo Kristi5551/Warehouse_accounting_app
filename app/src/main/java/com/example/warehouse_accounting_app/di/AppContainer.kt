@@ -3,6 +3,7 @@ package com.example.warehouse_accounting_app.di
 import android.content.Context
 import com.example.warehouse_accounting_app.core.datastore.AuthDataStore
 import com.example.warehouse_accounting_app.core.network.createHttpClient
+import com.example.warehouse_accounting_app.core.util.AndroidAppLogger
 import com.example.warehouse_accounting_app.data.remote.api.AuthApi
 import com.example.warehouse_accounting_app.data.remote.api.CategoryApi
 import com.example.warehouse_accounting_app.data.remote.api.ProductApi
@@ -63,6 +64,7 @@ class AppContainer(context: Context) {
     val json: Json = Json { ignoreUnknownKeys = true; isLenient = true; explicitNulls = false }
 
     val authDataStore = AuthDataStore(appContext)
+    private val appLogger = AndroidAppLogger()
     private val httpClient = createHttpClient(authDataStore)
     private val authApi = AuthApi(httpClient, json)
     private val userApi = UserApi(httpClient, json)
@@ -71,7 +73,7 @@ class AppContainer(context: Context) {
     private val stockApi = StockApi(httpClient, json)
     private val reportApi = ReportApi(httpClient, json)
 
-    val authRepository: AuthRepository = AuthRepositoryImpl(authApi, authDataStore)
+    val authRepository: AuthRepository = AuthRepositoryImpl(authApi, authDataStore, appLogger)
     val userRepository: UserRepository = UserRepositoryImpl(userApi, authDataStore)
     val categoryRepository: CategoryRepository = CategoryRepositoryImpl(categoryApi)
     val productRepository: ProductRepository = ProductRepositoryImpl(productApi)

@@ -1,11 +1,10 @@
 package com.example.warehouse_accounting_app.data.repository
 
-import android.util.Log
-import com.example.warehouse_accounting_app.BuildConfig
 import com.example.warehouse_accounting_app.core.datastore.AuthDataStore
 import com.example.warehouse_accounting_app.core.network.ApiException
 import com.example.warehouse_accounting_app.core.network.logApiException
 import com.example.warehouse_accounting_app.core.network.logNetworkFailure
+import com.example.warehouse_accounting_app.core.util.AppLogger
 import com.example.warehouse_accounting_app.data.mapper.apiFailure
 import com.example.warehouse_accounting_app.data.mapper.networkFailure
 import com.example.warehouse_accounting_app.data.mapper.unknownFailure
@@ -26,24 +25,21 @@ private const val AUTH_LOG_TAG = "WarehouseAuth"
 class AuthRepositoryImpl(
     private val api: AuthApi,
     private val authDataStore: AuthDataStore,
+    private val logger: AppLogger,
 ) : AuthRepository {
     override suspend fun login(email: String, password: String): AppResult<User> =
         try {
             val response = api.login(LoginRequestDto(email = email, password = password))
             val received = response.token.isNotBlank()
-            if (BuildConfig.DEBUG) {
-                Log.d(AUTH_LOG_TAG, "login token received = $received")
-            }
+            logger.d(AUTH_LOG_TAG, "login token received = $received")
             if (!received) {
                 val msg = "Сервер не вернул токен"
                 AppResult.Error(msg, AppError.Unknown(msg))
             } else {
                 authDataStore.saveToken(response.token)
                 api.clearCachedAuthTokens()
-                if (BuildConfig.DEBUG) {
-                    val saved = !authDataStore.getTokenOnce().isNullOrBlank()
-                    Log.d(AUTH_LOG_TAG, "token saved = $saved")
-                }
+                val saved = !authDataStore.getTokenOnce().isNullOrBlank()
+                logger.d(AUTH_LOG_TAG, "token saved = $saved")
                 AppResult.Success(response.user.toDomain())
             }
         } catch (e: ApiException) {
@@ -87,10 +83,8 @@ class AuthRepositoryImpl(
 
     override suspend fun getCurrentUser(): AppResult<User> =
         try {
-            if (BuildConfig.DEBUG) {
-                val available = !authDataStore.getTokenOnce().isNullOrBlank()
-                Log.d(AUTH_LOG_TAG, "token available for request = $available")
-            }
+            val available = !authDataStore.getTokenOnce().isNullOrBlank()
+            logger.d(AUTH_LOG_TAG, "token available for request = $available")
             AppResult.Success(api.me().toDomain())
         } catch (e: ApiException) {
             logApiException(e, "GET /api/auth/me")

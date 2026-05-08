@@ -9,7 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.example.warehouse_accounting_app.di.WarehouseViewModelFactory
-import com.example.warehouse_accounting_app.core.navigation.AppNavGraph
+import com.example.warehouse_accounting_app.presentation.navigation.AppNavGraph
 import com.example.warehouse_accounting_app.core.ui.theme.WarehouseAccountingTheme
 
 class MainActivity : ComponentActivity() {
