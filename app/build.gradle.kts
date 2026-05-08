@@ -32,7 +32,7 @@ android {
 
     buildTypes {
         debug {
-            // HTTP к эмулятору (10.0.2.2) и локальному серверу; в release cleartext отключён
+            
             manifestPlaceholders["cleartextTraffic"] = "true"
             val props = loadLocalProperties()
             val apiBase = props.getProperty("api.base.url", "http://10.0.2.2:8080").trim()

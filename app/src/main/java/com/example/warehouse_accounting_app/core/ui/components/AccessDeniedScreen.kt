@@ -21,10 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-/**
- * Экран «Доступ запрещён».
- * Показывается когда пользователь пытается открыть раздел без нужных прав.
- */
 @Composable
 fun AccessDeniedScreen(
     modifier: Modifier = Modifier,

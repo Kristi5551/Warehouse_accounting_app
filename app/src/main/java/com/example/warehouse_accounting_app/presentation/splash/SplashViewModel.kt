@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 sealed class SplashDestination {
     data object Login : SplashDestination()
     data object Dashboard : SplashDestination()
-    /** Сервер недоступен или произошла ошибка — пользователя на Dashboard не пускаем. */
     data class Error(val message: String) : SplashDestination()
 }
 

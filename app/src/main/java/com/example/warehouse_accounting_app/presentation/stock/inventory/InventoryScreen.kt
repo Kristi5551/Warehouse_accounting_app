@@ -41,6 +41,7 @@ import com.example.warehouse_accounting_app.core.ui.components.AppButton
 import com.example.warehouse_accounting_app.core.ui.components.AppScaffold
 import com.example.warehouse_accounting_app.core.ui.components.AppTopBar
 import com.example.warehouse_accounting_app.core.ui.components.LoadingContent
+import com.example.warehouse_accounting_app.core.util.NumberFormatters
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +55,7 @@ fun InventoryScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val selected = state.selectedProduct
     val booked = state.bookedQuantity
-    val actualVal = state.actualQuantity.toDoubleOrNull()
+    val actualVal = NumberFormatters.parseUserDecimal(state.actualQuantity)
     val diff = if (booked != null && actualVal != null) actualVal - booked else null
 
     LaunchedEffect(Unit) {
@@ -119,7 +120,7 @@ fun InventoryScreen(
                             Text("Загрузка учётного остатка…", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         } else if (booked != null) {
                             Text(
-                                "Учётный остаток: ${"%.3f".format(booked)} ${selected.unit}",
+                                "Учётный остаток: ${NumberFormatters.quantityDisplay(booked)} ${selected.unit}",
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Medium,
                             )
@@ -145,7 +146,7 @@ fun InventoryScreen(
                         ) {
                             Text("Расхождение:", style = MaterialTheme.typography.bodyMedium)
                             Text(
-                                "${if (diff >= 0) "+" else ""}${"%.3f".format(diff)}",
+                                "${if (diff >= 0) "+" else ""}${NumberFormatters.quantityDisplay(diff)}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = diffColor,

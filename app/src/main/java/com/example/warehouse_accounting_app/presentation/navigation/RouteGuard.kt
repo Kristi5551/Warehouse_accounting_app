@@ -20,18 +20,7 @@ import com.example.warehouse_accounting_app.domain.model.UserRole
 import com.example.warehouse_accounting_app.presentation.access.GuardState
 import com.example.warehouse_accounting_app.presentation.access.RouteGuardViewModel
 
-/**
- * Защищает экран по роли пользователя.
- *
- * - Пока роль загружается — [LoadingContent].
- * - Успех и [allowed] — [content].
- * - Успех, но роль не подходит — [AccessDeniedScreen].
- * - 401 или «конец сессии» по /me — [SessionExpiredScreen] (токен уже очищен), затем [onSessionExpired].
- * - Прочий 403 по /me — сообщение об ошибке, токен сохранён, можно retry.
- * - Сеть / сервер / прочее — [ErrorContent] с понятными сообщениями.
- *
- * @param onSessionExpired перейти на экран входа и сбросить стек.
- */
+
 @Composable
 fun RoleGuard(
     viewModelFactory: WarehouseViewModelFactory,

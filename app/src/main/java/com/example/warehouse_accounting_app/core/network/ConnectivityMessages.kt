@@ -5,7 +5,6 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
-/** Понятные сообщения при сбоях сети (Ktor Android → IOException и наследники). */
 fun connectivityMessage(cause: Throwable): String = when (cause) {
     is UnknownHostException ->
         "Сервер не найден по адресу. Эмулятор: 10.0.2.2. " +

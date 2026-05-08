@@ -51,7 +51,7 @@ fun CategoryEditScreen(
         viewModel.events.collect { event ->
             when (event) {
                 CategoryEditEvent.SaveSuccess -> onSaved()
-                is CategoryEditEvent.ShowError -> { /* snackbar уже в state */ }
+                is CategoryEditEvent.ShowError -> {  }
                 CategoryEditEvent.SessionExpired -> onSessionExpired()
             }
         }

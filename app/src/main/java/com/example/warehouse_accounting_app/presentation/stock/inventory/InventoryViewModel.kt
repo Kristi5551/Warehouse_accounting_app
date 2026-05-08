@@ -8,6 +8,7 @@ import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductsUseCase
 import com.example.warehouse_accounting_app.domain.usecase.stock.CreateInventoryUseCase
 import com.example.warehouse_accounting_app.domain.usecase.stock.GetStockBalancesUseCase
+import com.example.warehouse_accounting_app.core.util.NumberFormatters
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -84,7 +85,7 @@ class InventoryViewModel(
             _state.update { it.copy(productError = "Выберите товар") }
             err = true
         }
-        val actual = s.actualQuantity.trim().toDoubleOrNull()
+        val actual = NumberFormatters.parseUserDecimal(s.actualQuantity)
         if (actual == null || actual < 0) {
             _state.update { it.copy(actualError = "Введите фактический остаток ≥ 0") }
             err = true

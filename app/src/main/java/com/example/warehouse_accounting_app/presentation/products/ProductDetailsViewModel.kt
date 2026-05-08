@@ -14,11 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel для экрана деталей товара.
- * Загружает товар через GET /api/products/{id} (не из предварительно загруженного списка)
- * и последние 10 операций через GET /api/stock/products/{id}/history.
- */
 class ProductDetailsViewModel(
     private val getProductDetailsUseCase: GetProductDetailsUseCase,
     private val getProductHistoryUseCase: GetProductHistoryUseCase,

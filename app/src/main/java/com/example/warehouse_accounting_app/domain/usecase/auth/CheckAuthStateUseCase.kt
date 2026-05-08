@@ -4,20 +4,6 @@ import com.example.warehouse_accounting_app.domain.result.AppError
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.repository.AuthRepository
 
-/**
- * Проверяет, авторизован ли пользователь при старте приложения.
- *
- * Алгоритм:
- * 1. Если токена нет — [AuthCheckResult.Unauthenticated].
- * 2. Если токен есть — вызывает /api/auth/me.
- * 3. Успех — [AuthCheckResult.Authenticated].
- * 4. 401 на /me или 403 «аккаунт недоступен» — токен очищен в репозитории, [Unauthenticated].
- * 5. Иной 403 на /me — токен не трогаем, [UnknownError] (редко).
- * 6. Сетевая ошибка — [NetworkError] (токен сохранён).
- * 7. 5xx и прочее — [UnknownError] (токен сохранён).
- *
- * Зависимости: только domain-репозиторий и domain.result.
- */
 class CheckAuthStateUseCase(
     private val repository: AuthRepository,
 ) {

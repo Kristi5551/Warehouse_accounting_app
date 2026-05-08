@@ -8,6 +8,7 @@ data class CategoryListState(
     val searchQuery: String = "",
     val errorMessage: String? = null,
     val successMessage: String? = null,
+    val isAdminUser: Boolean = false,
 )
 
 val CategoryListState.filtered: List<Category>

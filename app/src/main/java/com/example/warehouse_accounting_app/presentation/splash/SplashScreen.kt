@@ -29,11 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-/**
- * @param error        Сообщение об ошибке (null — показывать loading).
- * @param onRetry      Повторить проверку авторизации.
- * @param onLoginAnyway Перейти к экрану входа без проверки.
- */
 @Composable
 fun SplashScreenContent(
     error: String? = null,

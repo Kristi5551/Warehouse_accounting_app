@@ -17,7 +17,6 @@ import com.example.warehouse_accounting_app.core.ui.theme.ColorStockOut
 import com.example.warehouse_accounting_app.core.ui.theme.ColorStockOutContainer
 import com.example.warehouse_accounting_app.domain.model.StockStatus
 
-/** Chip для отображения статуса остатка (В наличии / Низкий остаток / Нет в наличии). */
 @Composable
 fun StockStatusChip(status: StockStatus, modifier: Modifier = Modifier) {
     val (bg, fg) = when (status) {

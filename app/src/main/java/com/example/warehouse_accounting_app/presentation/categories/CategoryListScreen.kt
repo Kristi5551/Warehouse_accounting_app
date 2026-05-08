@@ -99,7 +99,7 @@ fun CategoryListScreen(
         topBar = { AppTopBar(title = "Категории", onBack = onBack) },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            if (viewModel.isAdmin()) {
+            if (state.isAdminUser) {
                 FloatingActionButton(
                     onClick = { viewModel.onCreateClick() },
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -141,7 +141,7 @@ fun CategoryListScreen(
                         items(state.filtered, key = { it.id }) { category ->
                             CategoryCard(
                                 category = category,
-                                isAdmin = viewModel.isAdmin(),
+                                isAdmin = state.isAdminUser,
                                 onEdit = { viewModel.onEditClick(category.id) },
                                 onDeactivate = { categoryToDeactivate = category.id },
                             )

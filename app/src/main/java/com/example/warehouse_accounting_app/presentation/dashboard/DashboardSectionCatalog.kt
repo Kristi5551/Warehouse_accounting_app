@@ -33,10 +33,6 @@ private data class DashboardSectionDefinition(
     val canOpen: (UserRole) -> Boolean,
 )
 
-/**
- * Полный каталог карточек дашборда в фиксированном порядке.
- * Видимость задаётся через [RolePermissions]; тексты сохраняют прежнее поведение по ролям.
- */
 private val dashboardSectionCatalog: List<DashboardSectionDefinition> = listOf(
     DashboardSectionDefinition(
         route = AppRoutes.Users,

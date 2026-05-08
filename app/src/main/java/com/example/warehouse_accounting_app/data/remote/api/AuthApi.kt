@@ -25,7 +25,6 @@ class AuthApi(
     private val client: HttpClient,
     private val json: Json,
 ) {
-    /** Сброс кэша JWT в Ktor Bearer: после смены токена в DataStore иначе уходят запросы со старым токеном. */
     fun clearCachedAuthTokens() {
         client.authProvider<BearerAuthProvider>()?.clearToken()
     }

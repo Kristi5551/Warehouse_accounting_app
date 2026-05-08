@@ -19,7 +19,6 @@ import com.example.warehouse_accounting_app.core.ui.theme.ColorOpWriteOff
 import com.example.warehouse_accounting_app.core.ui.theme.ColorOpWriteOffContainer
 import com.example.warehouse_accounting_app.domain.model.StockOperationType
 
-/** Chip для отображения типа складской операции в списках и карточках. */
 @Composable
 fun OperationTypeChip(type: StockOperationType, modifier: Modifier = Modifier) {
     val (bg, fg) = when (type) {

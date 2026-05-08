@@ -16,9 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-/**
- * Экран/блок пустого состояния: иконка + заголовок + опциональный подзаголовок.
- */
 @Composable
 fun EmptyContent(
     message: String,

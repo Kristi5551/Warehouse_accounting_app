@@ -8,7 +8,7 @@ import org.junit.Test
 
 class RoleAccessContractTest {
 
-    /** Фиксированная матрица видимости дашборда; при изменении прав обновляйте [ROLE_ACCESS_CONTRACT.md] и этот набор. */
+    
     private val expectedRoutesByRole: Map<UserRole, Set<String>> =
         mapOf(
             UserRole.ADMIN to

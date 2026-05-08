@@ -7,6 +7,7 @@ import com.example.warehouse_accounting_app.domain.model.Product
 import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductsUseCase
 import com.example.warehouse_accounting_app.domain.usecase.stock.CreateReceiptUseCase
+import com.example.warehouse_accounting_app.core.util.NumberFormatters
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -54,12 +55,12 @@ class ReceiptViewModel(
             _state.update { it.copy(productError = "Выберите товар") }
             err = true
         }
-        val qty = s.quantity.trim().toDoubleOrNull()
+        val qty = NumberFormatters.parseUserDecimal(s.quantity)
         if (qty == null || qty <= 0) {
             _state.update { it.copy(quantityError = "Введите количество > 0") }
             err = true
         }
-        val price = s.price.trim().toDoubleOrNull()
+        val price = NumberFormatters.parseUserDecimal(s.price)
         if (price == null || price < 0) {
             _state.update { it.copy(priceError = "Введите цену ≥ 0") }
             err = true

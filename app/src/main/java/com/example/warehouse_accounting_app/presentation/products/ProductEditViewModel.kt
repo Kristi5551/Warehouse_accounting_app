@@ -9,6 +9,7 @@ import com.example.warehouse_accounting_app.domain.usecase.category.GetCategorie
 import com.example.warehouse_accounting_app.domain.usecase.product.CreateProductUseCase
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductDetailsUseCase
 import com.example.warehouse_accounting_app.domain.usecase.product.UpdateProductUseCase
+import com.example.warehouse_accounting_app.core.util.NumberFormatters
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -63,9 +64,9 @@ class ProductEditViewModel(
                             isLoading = false, editingProduct = p,
                             article = p.article, name = p.name,
                             selectedCategoryId = p.categoryId, unit = p.unit,
-                            purchasePrice = "%.2f".format(p.purchasePrice),
-                            salePrice = "%.2f".format(p.salePrice),
-                            minStock = "%.3f".format(p.minStock),
+                            purchasePrice = NumberFormatters.editableDecimal(p.purchasePrice, 2),
+                            salePrice = NumberFormatters.editableDecimal(p.salePrice, 2),
+                            minStock = NumberFormatters.editableDecimal(p.minStock, 3),
                             isActive = p.isActive,
                         )
                     }
@@ -93,9 +94,9 @@ class ProductEditViewModel(
         val article = s.article.trim()
         val name = s.name.trim()
         val unit = s.unit.trim()
-        val pp = s.purchasePrice.trim().toDoubleOrNull()
-        val sp = s.salePrice.trim().toDoubleOrNull()
-        val ms = s.minStock.trim().toDoubleOrNull()
+        val pp = NumberFormatters.parseUserDecimal(s.purchasePrice)
+        val sp = NumberFormatters.parseUserDecimal(s.salePrice)
+        val ms = NumberFormatters.parseUserDecimal(s.minStock)
 
         if (article.isBlank()) { _state.update { it.copy(articleError = "Артикул не может быть пустым") }; hasError = true }
         if (name.isBlank()) { _state.update { it.copy(nameError = "Название не может быть пустым") }; hasError = true }

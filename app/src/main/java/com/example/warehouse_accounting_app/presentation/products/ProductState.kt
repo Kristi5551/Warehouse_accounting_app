@@ -57,8 +57,6 @@ data class ProductEditState(
 
 val ProductEditState.isEditMode: Boolean get() = editingProduct != null
 
-// ── Details ───────────────────────────────────────────────────────────────────
-
 data class ProductDetailsState(
     val isProductLoading: Boolean = true,
     val product: Product? = null,

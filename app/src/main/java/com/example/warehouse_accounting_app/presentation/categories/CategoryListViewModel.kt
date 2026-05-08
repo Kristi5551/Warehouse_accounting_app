@@ -29,8 +29,6 @@ class CategoryListViewModel(
     private val _events = Channel<CategoryListEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
-    private var currentUserRole: UserRole? = null
-
     init {
         loadUserRole()
         loadCategories()
@@ -39,8 +37,11 @@ class CategoryListViewModel(
     private fun loadUserRole() {
         viewModelScope.launch {
             when (val result = getCurrentUserUseCase()) {
-                is AppResult.Success -> currentUserRole = result.data.role
+                is AppResult.Success -> {
+                    _state.update { it.copy(isAdminUser = result.data.role == UserRole.ADMIN) }
+                }
                 is AppResult.Error -> {
+                    _state.update { it.copy(isAdminUser = false) }
                     when (result.appError) {
                         is AppError.SessionExpired,
                         is AppError.Unauthorized,
@@ -83,9 +84,6 @@ class CategoryListViewModel(
             }
         }
     }
-
-    fun isAdmin(): Boolean = currentUserRole == UserRole.ADMIN
-    fun getUserRole(): UserRole? = currentUserRole
 
     fun onCreateClick() {
         viewModelScope.launch { _events.send(CategoryListEvent.NavigateToCreate) }

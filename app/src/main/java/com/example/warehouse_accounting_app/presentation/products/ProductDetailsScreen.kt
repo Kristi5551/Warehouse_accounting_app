@@ -45,6 +45,7 @@ import com.example.warehouse_accounting_app.core.ui.components.AppScaffold
 import com.example.warehouse_accounting_app.core.ui.components.AppTopBar
 import com.example.warehouse_accounting_app.core.ui.components.ErrorContent
 import com.example.warehouse_accounting_app.core.ui.components.LoadingContent
+import com.example.warehouse_accounting_app.core.util.NumberFormatters
 import com.example.warehouse_accounting_app.core.ui.format.ruLabel
 import com.example.warehouse_accounting_app.domain.model.Product
 import com.example.warehouse_accounting_app.domain.model.StockOperation
@@ -62,7 +63,6 @@ fun ProductDetailsScreen(
     val viewModel: ProductDetailsViewModel = viewModel(factory = viewModelFactory)
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    // Загружаем товар по id через GET /api/products/{id} при каждом открытии экрана
     LaunchedEffect(productId) { viewModel.loadProduct(productId) }
 
     AppScaffold(
@@ -143,9 +143,9 @@ private fun ProductInfoCard(product: Product) {
             DetailRow("Артикул", product.article)
             DetailRow("Категория", product.categoryName ?: "—")
             DetailRow("Единица измерения", product.unit)
-            DetailRow("Закупочная цена", "${"%.2f".format(product.purchasePrice)} ₽")
-            DetailRow("Цена продажи", "${"%.2f".format(product.salePrice)} ₽")
-            DetailRow("Минимальный остаток", "${product.minStock} ${product.unit}")
+            DetailRow("Закупочная цена", "${NumberFormatters.moneyAmountDisplay(product.purchasePrice)} ₽")
+            DetailRow("Цена продажи", "${NumberFormatters.moneyAmountDisplay(product.salePrice)} ₽")
+            DetailRow("Минимальный остаток", "${NumberFormatters.quantityDisplay(product.minStock)} ${product.unit}")
         }
     }
 }
@@ -254,7 +254,7 @@ private fun HistoryRow(op: StockOperation) {
             )
             val qty = op.items.sumOf { it.quantity }
             Text(
-                if (qty % 1.0 == 0.0) qty.toLong().toString() else "%.3f".format(qty),
+                NumberFormatters.quantityDisplay(qty),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,

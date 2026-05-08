@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-/** Имя хранилища «auth» → файл `datastore/auth.preferences_pb` (относительно app files); исключён из auto-backup в res/xml. */
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
 
 class AuthDataStore(

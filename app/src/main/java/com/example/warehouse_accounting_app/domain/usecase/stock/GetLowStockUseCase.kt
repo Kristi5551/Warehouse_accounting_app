@@ -4,7 +4,6 @@ import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.StockBalance
 import com.example.warehouse_accounting_app.domain.repository.StockRepository
 
-/** Данные с `GET /api/stock/low` для экрана низких остатков (операционные строки [StockBalance]). */
 class GetLowStockUseCase(private val repository: StockRepository) {
     suspend operator fun invoke(): AppResult<List<StockBalance>> =
         repository.getLowStock()

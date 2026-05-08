@@ -12,7 +12,6 @@ data class StockBalanceState(
     val errorMessage: String? = null,
 )
 
-/** Локальный фильтр по поиску для режима «Низкие остатки» (данные уже с сервера). */
 val StockBalanceState.filteredForLow: List<StockBalance>
     get() {
         val q = searchQuery.trim()

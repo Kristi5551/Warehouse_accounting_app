@@ -15,13 +15,10 @@ import kotlinx.coroutines.launch
 sealed interface GuardState {
     data object Loading : GuardState
 
-    /** Профиль загружен; отказ в доступе — только если [RoleGuard] не пропускает роль. */
     data class Loaded(val role: UserRole) : GuardState
 
-    /** 401 или закрытая учётная запись на /me — токен очищен в репозитории. */
     data object Unauthorized : GuardState
 
-    /** /me вернул 403 без признаков «конец сессии» — токен сохранён (редкий случай). */
     data class ProfileAccessDenied(val message: String) : GuardState
 
     data class NetworkError(val message: String) : GuardState
@@ -31,10 +28,6 @@ sealed interface GuardState {
     data class UnknownError(val message: String) : GuardState
 }
 
-/**
- * ViewModel для проверки актуальной роли ([GET /api/auth/me]) перед открытием экрана.
- * Используется в [com.example.warehouse_accounting_app.presentation.navigation.RoleGuard].
- */
 class RouteGuardViewModel(
     private val getCurrentUser: GetCurrentUserUseCase,
 ) : ViewModel() {
@@ -46,7 +39,6 @@ class RouteGuardViewModel(
         load()
     }
 
-    /** Повторная загрузка профиля (например, после сетевой ошибки). */
     fun retry() {
         load()
     }

@@ -23,7 +23,6 @@ import kotlinx.serialization.json.Json
 
 private const val AUTH_DIAG_TAG = "WarehouseAuth"
 
-/** Пути login/register: не форсируем проактивный Bearer (токена ещё нет). */
 private fun isAuthAnonymousOnlyPath(builder: HttpRequestBuilder): Boolean {
     val segs = builder.url.pathSegments.filter { it.isNotEmpty() }
     val path = if (segs.isEmpty()) "/" else "/" + segs.joinToString("/")
@@ -74,8 +73,8 @@ fun createHttpClient(authDataStore: AuthDataStore): HttpClient {
                         BearerTokens(accessToken = token, refreshToken = "")
                     }
                 }
-                // На практике без явной настройки часть запросов уходит до повторной отправки с Bearer;
-                // для всех путей кроме login/register сразу подключаем токен из DataStore.
+                
+                
                 sendWithoutRequest { request ->
                     !isAuthAnonymousOnlyPath(request)
                 }

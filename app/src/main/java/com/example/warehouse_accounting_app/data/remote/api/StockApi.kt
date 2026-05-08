@@ -39,17 +39,12 @@ class StockApi(private val client: HttpClient, private val json: Json) {
         return r.body()
     }
 
-    /** Операционный список низких остатков: `GET /api/stock/low` → [StockBalanceResponseDto]. */
     suspend fun getLowStock(): List<StockBalanceResponseDto> {
         val r = client.get(AppConfig.url("api/stock/low"))
         if (!r.status.isSuccess()) throw parseError(r.status.value, r.bodyAsText())
         return r.body()
     }
 
-    /**
-     * `GET /api/operations` — **dateFrom** / **dateTo** в `yyyy-MM-dd`, если заданы.
-     * Семантика периода совпадает с отчётом (см. `API_DATE_RANGE.md` на сервере).
-     */
     suspend fun getOperations(
         type: String?,
         productId: Long?,
@@ -70,7 +65,6 @@ class StockApi(private val client: HttpClient, private val json: Json) {
         return r.body()
     }
 
-    /** `GET /api/stock/products/{id}/history` — те же **dateFrom** / **dateTo** в `yyyy-MM-dd`. */
     suspend fun getProductHistory(
         productId: Long,
         operationType: String?,

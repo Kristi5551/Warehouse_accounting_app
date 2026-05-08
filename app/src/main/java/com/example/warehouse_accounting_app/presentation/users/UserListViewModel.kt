@@ -170,11 +170,6 @@ class UserListViewModel(
         }
     }
 
-    /**
-     * Загружает список пользователей с учётом текущего фильтра.
-     * - PENDING → GET /api/users/pending (оптимизированный endpoint)
-     * - остальные → GET /api/users с клиентской фильтрацией
-     */
     private suspend fun load() {
         _state.update { it.copy(isLoading = true, errorMessage = null) }
         val currentFilter = _state.value.filter

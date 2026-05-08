@@ -8,10 +8,6 @@ private fun String?.nonBlankOr(other: String): String {
     return if (t.isNotEmpty()) t else other
 }
 
-/**
- * Преобразует доменную ошибку в текст для отображения пользователю.
- * Если сервер уже передал сообщение — оно используется; иначе — типовой fallback.
- */
 fun AppError.toUserMessage(fallback: String = ""): String {
     val primary = message.trim()
     if (primary.isNotEmpty()) return primary

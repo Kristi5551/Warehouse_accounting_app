@@ -80,14 +80,14 @@ class AppContainer(context: Context) {
     val stockRepository: StockRepository = StockRepositoryImpl(stockApi)
     val reportRepository: ReportRepository = ReportRepositoryImpl(reportApi)
 
-    // Auth
+    
     val loginUseCase = LoginUseCase(authRepository)
     val registerUseCase = RegisterUseCase(authRepository)
     val logoutUseCase = LogoutUseCase(authRepository)
     val getCurrentUserUseCase = GetCurrentUserUseCase(authRepository)
     val checkAuthStateUseCase = CheckAuthStateUseCase(authRepository)
 
-    // Users
+    
     val getUsersUseCase = GetUsersUseCase(userRepository)
     val getPendingUsersUseCase = GetPendingUsersUseCase(userRepository)
     val approveUserUseCase = ApproveUserUseCase(userRepository)
@@ -97,21 +97,21 @@ class AppContainer(context: Context) {
     val createAdminUserUseCase = CreateAdminUserUseCase(userRepository)
     val getUsersForOperationFiltersUseCase = GetUsersForOperationFiltersUseCase(userRepository)
 
-    // Categories
+    
     val getCategoriesUseCase = GetCategoriesUseCase(categoryRepository)
     val getCategoryByIdUseCase = GetCategoryByIdUseCase(categoryRepository)
     val createCategoryUseCase = CreateCategoryUseCase(categoryRepository)
     val updateCategoryUseCase = UpdateCategoryUseCase(categoryRepository)
     val deleteCategoryUseCase = DeleteCategoryUseCase(categoryRepository)
 
-    // Products
+    
     val getProductsUseCase = GetProductsUseCase(productRepository)
     val getProductDetailsUseCase = GetProductDetailsUseCase(productRepository)
     val createProductUseCase = CreateProductUseCase(productRepository)
     val updateProductUseCase = UpdateProductUseCase(productRepository)
     val deleteProductUseCase = DeleteProductUseCase(productRepository)
 
-    // Stock
+    
     val getStockBalancesUseCase = GetStockBalancesUseCase(stockRepository)
     val getLowStockUseCase = GetLowStockUseCase(stockRepository)
     val createReceiptUseCase = CreateReceiptUseCase(stockRepository)
@@ -121,7 +121,7 @@ class AppContainer(context: Context) {
     val getOperationHistoryUseCase = GetOperationHistoryUseCase(stockRepository)
     val getProductHistoryUseCase = GetProductHistoryUseCase(stockRepository)
 
-    // Reports
+    
     val getStockSummaryReportUseCase = GetStockSummaryReportUseCase(reportRepository)
     val getLowStockReportUseCase = GetLowStockReportUseCase(reportRepository)
     val getOperationsReportUseCase = GetOperationsReportUseCase(reportRepository)

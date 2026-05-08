@@ -27,7 +27,6 @@ class ReportApi(private val client: HttpClient, private val json: Json) {
         return r.body()
     }
 
-    /** Отчётные строки по низким остаткам: `GET /api/reports/low-stock` → [LowStockReportResponseDto]. */
     suspend fun getLowStockReport(warehouseId: Long?): List<LowStockReportResponseDto> {
         val url = AppConfig.url("api/reports/low-stock") + (warehouseId?.let { "?warehouseId=$it" } ?: "")
         val r = client.get(url)
@@ -35,10 +34,6 @@ class ReportApi(private val client: HttpClient, private val json: Json) {
         return r.body()
     }
 
-    /**
-     * `GET /api/reports/operations` — **dateFrom** / **dateTo** в `yyyy-MM-dd` или не передаются, если null/пусто.
-     * На сервере: день **dateTo** включается целиком (`API_DATE_RANGE.md` в модуле сервера).
-     */
     suspend fun getOperationsReport(dateFrom: String?, dateTo: String?): OperationsReportBundleResponseDto {
         val parts = buildList {
             dateFrom?.takeIf { it.isNotBlank() }?.let { add("dateFrom=${enc(it.trim())}") }
