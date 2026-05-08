@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.UserRole
 import com.example.warehouse_accounting_app.domain.usecase.auth.RegisterUseCase
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,7 +56,7 @@ class RegisterViewModel(
                     }
                 }
                 is AppResult.Error -> {
-                    _state.update { it.copy(isLoading = false, errorMessage = result.message) }
+                    _state.update { it.copy(isLoading = false, errorMessage = result.toUserMessage()) }
                 }
             }
         }

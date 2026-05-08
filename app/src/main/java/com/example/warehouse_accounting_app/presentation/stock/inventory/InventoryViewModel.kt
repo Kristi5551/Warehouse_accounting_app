@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.Product
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductsUseCase
 import com.example.warehouse_accounting_app.domain.usecase.stock.CreateInventoryUseCase
 import com.example.warehouse_accounting_app.domain.usecase.stock.GetStockBalancesUseCase
@@ -37,7 +38,7 @@ class InventoryViewModel(
                 is AppResult.Success ->
                     _state.update { it.copy(isLoading = false, products = r.data) }
                 is AppResult.Error ->
-                    _state.update { it.copy(isLoading = false, errorMessage = r.message) }
+                    _state.update { it.copy(isLoading = false, errorMessage = r.toUserMessage()) }
             }
         }
     }
@@ -66,7 +67,7 @@ class InventoryViewModel(
                 }
                 is AppResult.Error -> {
                     _state.update {
-                        it.copy(isLoadingBalance = false, bookedQuantity = 0.0, errorMessage = r.message)
+                        it.copy(isLoadingBalance = false, bookedQuantity = 0.0, errorMessage = r.toUserMessage())
                     }
                 }
             }
@@ -104,7 +105,7 @@ class InventoryViewModel(
                     _events.send(InventoryEvent.Success)
                 }
                 is AppResult.Error -> {
-                    val msg = result.message
+                    val msg = result.toUserMessage()
                     _state.update { it.copy(isSaving = false, errorMessage = msg) }
                     _events.send(InventoryEvent.Error(msg))
                 }

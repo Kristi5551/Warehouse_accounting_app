@@ -7,6 +7,8 @@
 
 Подробнее про эмулятор и `local.properties` см. `Warehouse_accounting_server/LOCAL_RUN.md`, раздел **«Android Emulator → сервер»**.
 
+Ручной сквозной smoke (эмулятор → сервер → Postgres), curl и проверки ролей: **`Warehouse_accounting_server/E2E_CHECKLIST.md`**.
+
 ## Сборка
 
 ```bat

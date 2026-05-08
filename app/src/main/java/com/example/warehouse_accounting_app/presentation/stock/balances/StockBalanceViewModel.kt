@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.StockStatus
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import com.example.warehouse_accounting_app.domain.usecase.stock.GetStockBalancesUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -67,7 +68,7 @@ class StockBalanceViewModel(
                     }
                 }
                 is AppResult.Error -> {
-                    val msg = r.message
+                    val msg = r.toUserMessage()
                     _state.update {
                         it.copy(
                             isLoading = false,

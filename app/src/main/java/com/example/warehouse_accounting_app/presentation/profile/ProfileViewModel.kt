@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.usecase.auth.GetCurrentUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.auth.LogoutUseCase
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,7 +30,7 @@ class ProfileViewModel(
                 is AppResult.Success ->
                     _state.update { it.copy(user = r.data, isLoading = false) }
                 is AppResult.Error ->
-                    _state.update { it.copy(isLoading = false, errorMessage = r.message) }
+                    _state.update { it.copy(isLoading = false, errorMessage = r.toUserMessage()) }
             }
         }
     }

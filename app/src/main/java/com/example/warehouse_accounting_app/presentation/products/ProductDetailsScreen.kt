@@ -1,4 +1,4 @@
-package com.example.warehouse_accounting_app.presentation.products
+﻿package com.example.warehouse_accounting_app.presentation.products
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,7 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
+import com.example.warehouse_accounting_app.di.WarehouseViewModelFactory
 import com.example.warehouse_accounting_app.core.ui.components.AppScaffold
 import com.example.warehouse_accounting_app.core.ui.components.AppTopBar
 import com.example.warehouse_accounting_app.core.ui.components.ErrorContent

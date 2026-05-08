@@ -2,9 +2,9 @@ package com.example.warehouse_accounting_app.presentation.users
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.warehouse_accounting_app.core.network.ApiException
-import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.User
+import com.example.warehouse_accounting_app.domain.result.AppError
+import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.usecase.auth.GetCurrentUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.ApproveUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.BlockUserUseCase
@@ -13,6 +13,7 @@ import com.example.warehouse_accounting_app.domain.usecase.user.CreateAdminUserU
 import com.example.warehouse_accounting_app.domain.usecase.user.GetPendingUsersUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.GetUsersUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.UnblockUserUseCase
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,6 +44,16 @@ class UserListViewModel(
             load()
         }
     }
+
+    private fun isSessionEnded(err: AppResult.Error): Boolean =
+        err.appError is AppError.Unauthorized || err.appError is AppError.SessionExpired
+
+    private fun userListErrorMessage(r: AppResult.Error): String =
+        when (r.appError) {
+            is AppError.Forbidden -> r.appError.toUserMessage("Недостаточно прав")
+            is AppError.NotFound -> r.appError.toUserMessage("Пользователь не найден")
+            else -> r.toUserMessage()
+        }
 
     fun onEvent(event: UserListEvent) {
         when (event) {
@@ -126,12 +137,11 @@ class UserListViewModel(
                     load()
                 }
                 is AppResult.Error -> {
-                    val code = (r.throwable as? ApiException)?.statusCode
                     _state.update {
                         it.copy(
                             actionInProgress = false,
-                            errorMessage = r.message,
-                            sessionExpired = code == 401,
+                            errorMessage = userListErrorMessage(r),
+                            sessionExpired = isSessionEnded(r),
                         )
                     }
                 }
@@ -148,12 +158,11 @@ class UserListViewModel(
                     load()
                 }
                 is AppResult.Error -> {
-                    val code = (r.throwable as? ApiException)?.statusCode
                     _state.update {
                         it.copy(
                             actionInProgress = false,
-                            errorMessage = r.message,
-                            sessionExpired = code == 401,
+                            errorMessage = userListErrorMessage(r),
+                            sessionExpired = isSessionEnded(r),
                         )
                     }
                 }
@@ -175,9 +184,12 @@ class UserListViewModel(
                     _state.update { it.copy(isLoading = false, users = r.data) }
                 }
                 is AppResult.Error -> {
-                    val code = (r.throwable as? ApiException)?.statusCode
                     _state.update {
-                        it.copy(isLoading = false, errorMessage = r.message, sessionExpired = code == 401)
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = userListErrorMessage(r),
+                            sessionExpired = isSessionEnded(r),
+                        )
                     }
                 }
             }
@@ -190,9 +202,12 @@ class UserListViewModel(
                     }
                 }
                 is AppResult.Error -> {
-                    val code = (r.throwable as? ApiException)?.statusCode
                     _state.update {
-                        it.copy(isLoading = false, errorMessage = r.message, sessionExpired = code == 401)
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = userListErrorMessage(r),
+                            sessionExpired = isSessionEnded(r),
+                        )
                     }
                 }
             }

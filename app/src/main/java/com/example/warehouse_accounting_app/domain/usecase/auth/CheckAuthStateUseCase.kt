@@ -16,7 +16,7 @@ import com.example.warehouse_accounting_app.domain.repository.AuthRepository
  * 6. Сетевая ошибка — [NetworkError] (токен сохранён).
  * 7. 5xx и прочее — [UnknownError] (токен сохранён).
  *
- * Зависимости: только domain-репозиторий + domain.result — без core.network.
+ * Зависимости: только domain-репозиторий и domain.result.
  */
 class CheckAuthStateUseCase(
     private val repository: AuthRepository,
@@ -35,7 +35,8 @@ class CheckAuthStateUseCase(
                 is AppError.Forbidden -> AuthCheckResult.UnknownError(result.message)
                 is AppError.Network -> AuthCheckResult.NetworkError(result.message)
                 is AppError.Server -> AuthCheckResult.UnknownError(result.message)
-                is AppError.Unknown, null -> AuthCheckResult.UnknownError(result.message)
+                is AppError.Validation, is AppError.NotFound, is AppError.Conflict, is AppError.Unknown ->
+                    AuthCheckResult.UnknownError(result.message)
             }
         }
     }

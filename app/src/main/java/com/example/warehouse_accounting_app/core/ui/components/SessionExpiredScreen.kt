@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Токен недействителен или доступ к профилю закрыт (401/403 с [GET /api/auth/me]).
- * Токен к этому моменту уже сброшен в [AuthRepositoryImpl].
+ * Токен к этому моменту уже сброшен в [com.example.warehouse_accounting_app.domain.repository.AuthRepository].
  */
 @Composable
 fun SessionExpiredScreen(

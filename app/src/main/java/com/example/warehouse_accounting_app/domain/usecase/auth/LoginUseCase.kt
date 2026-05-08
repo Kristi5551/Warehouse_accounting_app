@@ -8,8 +8,8 @@ class LoginUseCase(
     private val repository: AuthRepository,
 ) {
     suspend operator fun invoke(email: String, password: String): AppResult<User> {
-        if (email.isBlank()) return AppResult.Error("Введите email")
-        if (password.isBlank()) return AppResult.Error("Введите пароль")
+        if (email.isBlank()) return AppResult.validation("Введите email")
+        if (password.isBlank()) return AppResult.validation("Введите пароль")
         return repository.login(email.trim(), password)
     }
 }

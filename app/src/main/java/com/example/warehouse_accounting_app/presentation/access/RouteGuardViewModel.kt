@@ -2,9 +2,10 @@ package com.example.warehouse_accounting_app.presentation.access
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.warehouse_accounting_app.domain.model.UserRole
 import com.example.warehouse_accounting_app.domain.result.AppError
 import com.example.warehouse_accounting_app.domain.result.AppResult
-import com.example.warehouse_accounting_app.domain.model.UserRole
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import com.example.warehouse_accounting_app.domain.usecase.auth.GetCurrentUserUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -64,12 +65,15 @@ class RouteGuardViewModel(
     private fun mapError(r: AppResult.Error): GuardState =
         when (r.appError) {
             is AppError.SessionExpired, is AppError.Unauthorized -> GuardState.Unauthorized
-            is AppError.Forbidden -> GuardState.ProfileAccessDenied(r.message)
+            is AppError.Forbidden ->
+                GuardState.ProfileAccessDenied(r.toUserMessage("Недостаточно прав"))
             is AppError.Network ->
-                GuardState.NetworkError("Нет соединения с сервером")
+                GuardState.NetworkError(r.toUserMessage())
             is AppError.Server ->
-                GuardState.ServerError("Ошибка сервера. Попробуйте позже")
-            is AppError.Unknown, null ->
-                GuardState.UnknownError("Не удалось загрузить профиль. Проверьте подключение к сети и попробуйте снова.")
+                GuardState.ServerError(r.toUserMessage())
+            is AppError.Validation, is AppError.NotFound, is AppError.Conflict, is AppError.Unknown ->
+                GuardState.UnknownError(
+                    r.toUserMessage("Не удалось загрузить профиль. Проверьте подключение к сети и попробуйте снова."),
+                )
         }
 }

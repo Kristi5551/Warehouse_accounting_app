@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.warehouse_accounting_app.core.util.IsoCalendarDateQuery
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.reports.LowStockReport
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import com.example.warehouse_accounting_app.domain.model.reports.OperationsReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockSummaryReport
 import com.example.warehouse_accounting_app.domain.model.reports.StockValueReport
@@ -52,7 +53,7 @@ class ReportsViewModel(
             val valueD = async { getStockValueReportUseCase(null) }
             val opsD = async {
                 if (dateErr != null) {
-                    AppResult.Error(dateErr)
+                    AppResult.validation(dateErr)
                 } else {
                     getOperationsReportUseCase(
                         s.dateFromInput.trim().takeIf { it.isNotEmpty() },
@@ -82,7 +83,7 @@ class ReportsViewModel(
                 is AppResult.Success ->
                     _state.update { it.copy(isLoading = false, operationsReport = opsR.data, errorMessage = null) }
                 is AppResult.Error ->
-                    _state.update { it.copy(isLoading = false, errorMessage = opsR.message) }
+                    _state.update { it.copy(isLoading = false, errorMessage = opsR.toUserMessage()) }
             }
         }
     }
@@ -99,10 +100,10 @@ class ReportsViewModel(
         val value = if (valueR is AppResult.Success) valueR.data else null
         val firstError =
             listOfNotNull(
-                (summaryR as? AppResult.Error)?.message,
-                (lowR as? AppResult.Error)?.message,
-                (opsR as? AppResult.Error)?.message,
-                (valueR as? AppResult.Error)?.message,
+                (summaryR as? AppResult.Error)?.toUserMessage(),
+                (lowR as? AppResult.Error)?.toUserMessage(),
+                (opsR as? AppResult.Error)?.toUserMessage(),
+                (valueR as? AppResult.Error)?.toUserMessage(),
             ).firstOrNull()
         _state.update {
             it.copy(

@@ -6,6 +6,7 @@ import com.example.warehouse_accounting_app.core.util.IsoCalendarDateQuery
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.repository.OperationsFilter
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductsUseCase
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import com.example.warehouse_accounting_app.domain.usecase.stock.GetOperationHistoryUseCase
 import com.example.warehouse_accounting_app.domain.usecase.user.GetUsersForOperationFiltersUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,7 +78,7 @@ class OperationHistoryViewModel(
                 is AppResult.Success ->
                     _state.update { it.copy(isLoading = false, operations = r.data) }
                 is AppResult.Error ->
-                    _state.update { it.copy(isLoading = false, errorMessage = r.message) }
+                    _state.update { it.copy(isLoading = false, errorMessage = r.toUserMessage()) }
             }
         }
     }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.Product
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import com.example.warehouse_accounting_app.domain.model.UserRole
 import com.example.warehouse_accounting_app.domain.usecase.auth.GetCurrentUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.category.GetCategoriesUseCase
@@ -82,7 +83,7 @@ class ProductListViewModel(
                     it.copy(
                         isCategoriesLoading = false,
                         categories = emptyList(),
-                        categoriesErrorMessage = result.message.ifBlank { "Не удалось загрузить категории" },
+                        categoriesErrorMessage = result.toUserMessage("Не удалось загрузить категории"),
                         selectedCategoryId = null,
                     )
                 }
@@ -98,7 +99,7 @@ class ProductListViewModel(
             val s = _state.value
             when (val result = getProductsUseCase(activeOnly = s.activeOnly)) {
                 is AppResult.Success -> _state.update { it.copy(isLoading = false, products = result.data) }
-                is AppResult.Error -> _state.update { it.copy(isLoading = false, errorMessage = result.message) }
+                is AppResult.Error -> _state.update { it.copy(isLoading = false, errorMessage = result.toUserMessage()) }
             }
         }
     }
@@ -114,7 +115,7 @@ class ProductListViewModel(
                     _state.update { s -> s.copy(products = s.products.map { if (it.id == r.data.id) r.data else it }) }
                     _events.send(ProductListEvent.ShowSuccess("Товар «${r.data.name}» деактивирован"))
                 }
-                is AppResult.Error -> _events.send(ProductListEvent.ShowError(r.message))
+                is AppResult.Error -> _events.send(ProductListEvent.ShowError(r.toUserMessage()))
             }
         }
     }

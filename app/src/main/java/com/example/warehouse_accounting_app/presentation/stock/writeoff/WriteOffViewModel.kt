@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.Product
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductsUseCase
 import com.example.warehouse_accounting_app.domain.usecase.stock.CreateWriteOffUseCase
 import kotlinx.coroutines.channels.Channel
@@ -35,7 +36,7 @@ class WriteOffViewModel(
                 is AppResult.Success ->
                     _state.update { it.copy(isLoading = false, products = r.data) }
                 is AppResult.Error ->
-                    _state.update { it.copy(isLoading = false, errorMessage = r.message) }
+                    _state.update { it.copy(isLoading = false, errorMessage = r.toUserMessage()) }
             }
         }
     }
@@ -74,7 +75,7 @@ class WriteOffViewModel(
                     _events.send(WriteOffEvent.Success)
                 }
                 is AppResult.Error -> {
-                    val msg = result.message
+                    val msg = result.toUserMessage()
                     _state.update { it.copy(isSaving = false, errorMessage = msg) }
                     _events.send(WriteOffEvent.Error(msg))
                 }

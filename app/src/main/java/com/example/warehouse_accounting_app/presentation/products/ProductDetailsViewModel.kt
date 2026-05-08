@@ -2,10 +2,10 @@ package com.example.warehouse_accounting_app.presentation.products
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.warehouse_accounting_app.core.network.ApiException
-import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.model.UserRole
 import com.example.warehouse_accounting_app.domain.repository.StockHistoryFilter
+import com.example.warehouse_accounting_app.domain.result.AppResult
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import com.example.warehouse_accounting_app.domain.usecase.auth.GetCurrentUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductDetailsUseCase
 import com.example.warehouse_accounting_app.domain.usecase.stock.GetProductHistoryUseCase
@@ -28,11 +28,11 @@ class ProductDetailsViewModel(
     private val _state = MutableStateFlow(ProductDetailsState())
     val state = _state.asStateFlow()
 
-    private fun userVisibleProductError(r: AppResult.Error): String {
-        val t = r.throwable
-        if (t is ApiException && t.statusCode == 404) return "Запись не найдена"
-        return r.message.ifBlank { "Не удалось загрузить товар" }
-    }
+    private fun userVisibleProductError(r: AppResult.Error): String =
+        r.toUserMessage("Не удалось загрузить товар")
+
+    private fun userVisibleHistoryError(r: AppResult.Error): String =
+        r.toUserMessage("Не удалось загрузить историю товара")
 
     fun loadProduct(productId: Long) {
         viewModelScope.launch {
@@ -92,7 +92,7 @@ class ProductDetailsViewModel(
                 _state.update {
                     it.copy(
                         isHistoryLoading = false,
-                        historyErrorMessage = "Не удалось загрузить историю товара",
+                        historyErrorMessage = userVisibleHistoryError(r),
                     )
                 }
         }

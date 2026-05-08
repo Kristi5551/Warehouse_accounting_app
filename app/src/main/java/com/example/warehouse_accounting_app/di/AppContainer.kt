@@ -1,4 +1,4 @@
-package com.example.warehouse_accounting_app.core.di
+package com.example.warehouse_accounting_app.di
 
 import android.content.Context
 import com.example.warehouse_accounting_app.core.datastore.AuthDataStore

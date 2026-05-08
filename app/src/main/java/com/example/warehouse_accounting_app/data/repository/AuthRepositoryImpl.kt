@@ -4,18 +4,20 @@ import android.util.Log
 import com.example.warehouse_accounting_app.BuildConfig
 import com.example.warehouse_accounting_app.core.datastore.AuthDataStore
 import com.example.warehouse_accounting_app.core.network.ApiException
-import com.example.warehouse_accounting_app.core.network.connectivityMessage
 import com.example.warehouse_accounting_app.core.network.logApiException
 import com.example.warehouse_accounting_app.core.network.logNetworkFailure
-import com.example.warehouse_accounting_app.domain.result.AppError
-import com.example.warehouse_accounting_app.domain.result.AppResult
-import com.example.warehouse_accounting_app.data.mapper.toDomain
+import com.example.warehouse_accounting_app.data.mapper.apiFailure
+import com.example.warehouse_accounting_app.data.mapper.networkFailure
+import com.example.warehouse_accounting_app.data.mapper.unknownFailure
 import com.example.warehouse_accounting_app.data.remote.api.AuthApi
 import com.example.warehouse_accounting_app.data.remote.dto.request.LoginRequestDto
 import com.example.warehouse_accounting_app.data.remote.dto.request.RegisterRequestDto
+import com.example.warehouse_accounting_app.data.mapper.toDomain
 import com.example.warehouse_accounting_app.domain.model.User
 import com.example.warehouse_accounting_app.domain.model.UserRole
 import com.example.warehouse_accounting_app.domain.repository.AuthRepository
+import com.example.warehouse_accounting_app.domain.result.AppError
+import com.example.warehouse_accounting_app.domain.result.AppResult
 import kotlinx.coroutines.flow.Flow
 import java.io.IOException
 
@@ -33,7 +35,8 @@ class AuthRepositoryImpl(
                 Log.d(AUTH_LOG_TAG, "login token received = $received")
             }
             if (!received) {
-                AppResult.Error("Сервер не вернул токен", IllegalStateException("empty token"))
+                val msg = "Сервер не вернул токен"
+                AppResult.Error(msg, AppError.Unknown(msg))
             } else {
                 authDataStore.saveToken(response.token)
                 api.clearCachedAuthTokens()
@@ -45,13 +48,13 @@ class AuthRepositoryImpl(
             }
         } catch (e: ApiException) {
             logApiException(e, "POST /api/auth/login")
-            AppResult.Error(e.message ?: "Ошибка входа", e)
+            apiFailure(e)
         } catch (e: IOException) {
             logNetworkFailure(e, "POST /api/auth/login")
-            AppResult.Error(connectivityMessage(e), e)
+            networkFailure(e)
         } catch (e: Exception) {
             logNetworkFailure(e, "POST /api/auth/login")
-            AppResult.Error(connectivityMessage(e), e)
+            unknownFailure(e)
         }
 
     override suspend fun register(
@@ -61,24 +64,25 @@ class AuthRepositoryImpl(
         requestedRole: UserRole,
     ): AppResult<User> =
         try {
-            val user = api.register(
-                RegisterRequestDto(
-                    fullName = fullName,
-                    email = email,
-                    password = password,
-                    requestedRole = requestedRole.name,
-                ),
-            ).toDomain()
+            val user =
+                api.register(
+                    RegisterRequestDto(
+                        fullName = fullName,
+                        email = email,
+                        password = password,
+                        requestedRole = requestedRole.name,
+                    ),
+                ).toDomain()
             AppResult.Success(user)
         } catch (e: ApiException) {
             logApiException(e, "POST /api/auth/register")
-            AppResult.Error(e.message ?: "Ошибка регистрации", e)
+            apiFailure(e)
         } catch (e: IOException) {
             logNetworkFailure(e, "POST /api/auth/register")
-            AppResult.Error(connectivityMessage(e), e)
+            networkFailure(e)
         } catch (e: Exception) {
             logNetworkFailure(e, "POST /api/auth/register")
-            AppResult.Error(connectivityMessage(e), e)
+            unknownFailure(e)
         }
 
     override suspend fun getCurrentUser(): AppResult<User> =
@@ -90,39 +94,32 @@ class AuthRepositoryImpl(
             AppResult.Success(api.me().toDomain())
         } catch (e: ApiException) {
             logApiException(e, "GET /api/auth/me")
-            val msg = e.message ?: "Не удалось получить данные пользователя"
+            val msg = e.message?.trim().orEmpty().ifEmpty { "Не удалось получить данные пользователя" }
             when (e.statusCode) {
                 401 -> {
                     authDataStore.clearToken()
                     api.clearCachedAuthTokens()
-                    AppResult.Error(
-                        message = if (msg.isNotBlank()) msg else "Сессия истекла. Войдите снова.",
-                        throwable = e,
-                        appError = AppError.SessionExpired(msg.ifBlank { "Сессия истекла. Войдите снова." }),
-                    )
+                    val text = msg.ifBlank { "Сессия истекла. Войдите снова." }
+                    AppResult.Error(text, AppError.SessionExpired(text))
                 }
                 403 -> {
                     if (msg.meansAccountNoLongerActiveForSession()) {
                         authDataStore.clearToken()
                         api.clearCachedAuthTokens()
-                        AppResult.Error(msg, e, appError = AppError.SessionExpired(msg))
+                        val text = msg.ifBlank { "Сессия истекла." }
+                        AppResult.Error(text, AppError.SessionExpired(text))
                     } else {
-                        AppResult.Error(msg, e, appError = AppError.Forbidden(msg))
+                        AppResult.Error(msg, AppError.Forbidden(msg))
                     }
                 }
-                in 500..599 ->
-                    AppResult.Error(msg, e, appError = AppError.Server(msg))
-                else ->
-                    AppResult.Error(msg, e, appError = AppError.Unknown(msg))
+                else -> apiFailure(e, msg)
             }
         } catch (e: IOException) {
             logNetworkFailure(e, "GET /api/auth/me")
-            val msg = connectivityMessage(e)
-            AppResult.Error(msg, e, appError = AppError.Network(msg))
+            networkFailure(e)
         } catch (e: Exception) {
             logNetworkFailure(e, "GET /api/auth/me")
-            val msg = e.message ?: "Не удалось получить данные пользователя"
-            AppResult.Error(msg, e, appError = AppError.Unknown(msg))
+            unknownFailure(e)
         }
 
     override suspend fun logout() {

@@ -9,7 +9,7 @@ class ChangeUserRoleUseCase(
     private val repository: UserRepository,
 ) {
     suspend operator fun invoke(id: Long, role: UserRole): AppResult<User> {
-        if (id <= 0) return AppResult.Error("Некорректный идентификатор")
+        if (id <= 0) return AppResult.validation("Некорректный идентификатор")
         return repository.changeUserRole(id, role)
     }
 }

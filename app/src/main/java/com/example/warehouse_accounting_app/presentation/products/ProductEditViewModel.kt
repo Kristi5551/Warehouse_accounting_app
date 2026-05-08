@@ -2,8 +2,9 @@ package com.example.warehouse_accounting_app.presentation.products
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.warehouse_accounting_app.core.network.ApiException
+import com.example.warehouse_accounting_app.domain.result.AppError
 import com.example.warehouse_accounting_app.domain.result.AppResult
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import com.example.warehouse_accounting_app.domain.usecase.category.GetCategoriesUseCase
 import com.example.warehouse_accounting_app.domain.usecase.product.CreateProductUseCase
 import com.example.warehouse_accounting_app.domain.usecase.product.GetProductDetailsUseCase
@@ -39,6 +40,18 @@ class ProductEditViewModel(
         }
     }
 
+    private fun userVisibleLoadError(r: AppResult.Error): String =
+        when (r.appError) {
+            is AppError.NotFound -> r.appError.toUserMessage("Товар не найден")
+            else -> r.toUserMessage("Не удалось загрузить товар")
+        }
+
+    private fun userVisibleSaveError(r: AppResult.Error): String =
+        when (r.appError) {
+            is AppError.NotFound -> r.appError.toUserMessage("Товар не найден")
+            else -> r.toUserMessage()
+        }
+
     fun loadProduct(id: Long) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
@@ -58,13 +71,7 @@ class ProductEditViewModel(
                     }
                 }
                 is AppResult.Error -> {
-                    val msg =
-                        when {
-                            r.throwable is ApiException && (r.throwable as ApiException).statusCode == 404 ->
-                                "Запись не найдена"
-                            else -> r.message
-                        }
-                    _state.update { it.copy(isLoading = false, errorMessage = msg) }
+                    _state.update { it.copy(isLoading = false, errorMessage = userVisibleLoadError(r)) }
                 }
             }
         }
@@ -107,8 +114,15 @@ class ProductEditViewModel(
                 createProductUseCase(article, name, s.selectedCategoryId!!, unit, pp!!, sp!!, ms!!)
             }
             when (result) {
-                is AppResult.Success -> { _state.update { it.copy(isSaving = false) }; _events.send(ProductEditEvent.SaveSuccess) }
-                is AppResult.Error -> { _state.update { it.copy(isSaving = false, errorMessage = result.message) }; _events.send(ProductEditEvent.ShowError(result.message)) }
+                is AppResult.Success -> {
+                    _state.update { it.copy(isSaving = false) }
+                    _events.send(ProductEditEvent.SaveSuccess)
+                }
+                is AppResult.Error -> {
+                    val msg = userVisibleSaveError(result)
+                    _state.update { it.copy(isSaving = false, errorMessage = msg) }
+                    _events.send(ProductEditEvent.ShowError(msg))
+                }
             }
         }
     }

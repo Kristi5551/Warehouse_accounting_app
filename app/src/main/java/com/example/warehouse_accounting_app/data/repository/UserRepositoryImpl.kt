@@ -2,10 +2,11 @@ package com.example.warehouse_accounting_app.data.repository
 
 import com.example.warehouse_accounting_app.core.datastore.AuthDataStore
 import com.example.warehouse_accounting_app.core.network.ApiException
-import com.example.warehouse_accounting_app.core.network.connectivityMessage
 import com.example.warehouse_accounting_app.core.network.logApiException
 import com.example.warehouse_accounting_app.core.network.logNetworkFailure
-import com.example.warehouse_accounting_app.domain.result.AppResult
+import com.example.warehouse_accounting_app.data.mapper.apiFailure
+import com.example.warehouse_accounting_app.data.mapper.networkFailure
+import com.example.warehouse_accounting_app.data.mapper.unknownFailure
 import com.example.warehouse_accounting_app.data.mapper.toDomain
 import com.example.warehouse_accounting_app.data.mapper.toUserPick
 import com.example.warehouse_accounting_app.data.remote.api.UserApi
@@ -14,6 +15,7 @@ import com.example.warehouse_accounting_app.domain.model.User
 import com.example.warehouse_accounting_app.domain.model.UserPick
 import com.example.warehouse_accounting_app.domain.model.UserRole
 import com.example.warehouse_accounting_app.domain.repository.UserRepository
+import com.example.warehouse_accounting_app.domain.result.AppResult
 import java.io.IOException
 
 class UserRepositoryImpl(
@@ -34,13 +36,13 @@ class UserRepositoryImpl(
         } catch (e: ApiException) {
             logApiException(e, "GET /api/users")
             handleUnauthorized(e)
-            AppResult.Error(e.message ?: "Не удалось загрузить пользователей", e)
+            apiFailure(e)
         } catch (e: IOException) {
             logNetworkFailure(e, "GET /api/users")
-            AppResult.Error(connectivityMessage(e), e)
+            networkFailure(e, "Не удалось загрузить пользователей")
         } catch (e: Exception) {
             logNetworkFailure(e, "GET /api/users")
-            AppResult.Error("Не удалось загрузить пользователей", e)
+            unknownFailure(e, "Не удалось загрузить пользователей")
         }
 
     override suspend fun getPendingUsers(): AppResult<List<User>> =
@@ -49,13 +51,13 @@ class UserRepositoryImpl(
         } catch (e: ApiException) {
             logApiException(e, "GET /api/users/pending")
             handleUnauthorized(e)
-            AppResult.Error(e.message ?: "Не удалось загрузить пользователей", e)
+            apiFailure(e)
         } catch (e: IOException) {
             logNetworkFailure(e, "GET /api/users/pending")
-            AppResult.Error(connectivityMessage(e), e)
+            networkFailure(e, "Не удалось загрузить пользователей")
         } catch (e: Exception) {
             logNetworkFailure(e, "GET /api/users/pending")
-            AppResult.Error("Не удалось загрузить пользователей", e)
+            unknownFailure(e, "Не удалось загрузить пользователей")
         }
 
     override suspend fun approveUser(id: Long): AppResult<User> =
@@ -64,13 +66,13 @@ class UserRepositoryImpl(
         } catch (e: ApiException) {
             logApiException(e, "PATCH /api/users/$id/approve")
             handleUnauthorized(e)
-            AppResult.Error(e.message ?: "Не удалось подтвердить пользователя", e)
+            apiFailure(e)
         } catch (e: IOException) {
             logNetworkFailure(e, "PATCH /api/users/$id/approve")
-            AppResult.Error(connectivityMessage(e), e)
+            networkFailure(e, "Не удалось подтвердить пользователя")
         } catch (e: Exception) {
             logNetworkFailure(e, "PATCH /api/users/$id/approve")
-            AppResult.Error("Не удалось подтвердить пользователя", e)
+            unknownFailure(e, "Не удалось подтвердить пользователя")
         }
 
     override suspend fun blockUser(id: Long): AppResult<User> =
@@ -79,13 +81,13 @@ class UserRepositoryImpl(
         } catch (e: ApiException) {
             logApiException(e, "PATCH /api/users/$id/block")
             handleUnauthorized(e)
-            AppResult.Error(e.message ?: "Не удалось заблокировать пользователя", e)
+            apiFailure(e)
         } catch (e: IOException) {
             logNetworkFailure(e, "PATCH /api/users/$id/block")
-            AppResult.Error(connectivityMessage(e), e)
+            networkFailure(e, "Не удалось заблокировать пользователя")
         } catch (e: Exception) {
             logNetworkFailure(e, "PATCH /api/users/$id/block")
-            AppResult.Error("Не удалось заблокировать пользователя", e)
+            unknownFailure(e, "Не удалось заблокировать пользователя")
         }
 
     override suspend fun unblockUser(id: Long): AppResult<User> =
@@ -94,13 +96,13 @@ class UserRepositoryImpl(
         } catch (e: ApiException) {
             logApiException(e, "PATCH /api/users/$id/unblock")
             handleUnauthorized(e)
-            AppResult.Error(e.message ?: "Не удалось разблокировать пользователя", e)
+            apiFailure(e)
         } catch (e: IOException) {
             logNetworkFailure(e, "PATCH /api/users/$id/unblock")
-            AppResult.Error(connectivityMessage(e), e)
+            networkFailure(e, "Не удалось разблокировать пользователя")
         } catch (e: Exception) {
             logNetworkFailure(e, "PATCH /api/users/$id/unblock")
-            AppResult.Error("Не удалось разблокировать пользователя", e)
+            unknownFailure(e, "Не удалось разблокировать пользователя")
         }
 
     override suspend fun changeUserRole(id: Long, role: UserRole): AppResult<User> =
@@ -109,13 +111,13 @@ class UserRepositoryImpl(
         } catch (e: ApiException) {
             logApiException(e, "PATCH /api/users/$id/role")
             handleUnauthorized(e)
-            AppResult.Error(e.message ?: "Не удалось изменить роль", e)
+            apiFailure(e)
         } catch (e: IOException) {
             logNetworkFailure(e, "PATCH /api/users/$id/role")
-            AppResult.Error(connectivityMessage(e), e)
+            networkFailure(e, "Не удалось изменить роль")
         } catch (e: Exception) {
             logNetworkFailure(e, "PATCH /api/users/$id/role")
-            AppResult.Error("Не удалось изменить роль", e)
+            unknownFailure(e, "Не удалось изменить роль")
         }
 
     override suspend fun createAdmin(fullName: String, email: String, password: String): AppResult<User> =
@@ -124,13 +126,13 @@ class UserRepositoryImpl(
         } catch (e: ApiException) {
             logApiException(e, "POST /api/users/admin")
             handleUnauthorized(e)
-            AppResult.Error(e.message ?: "Не удалось создать администратора", e)
+            apiFailure(e)
         } catch (e: IOException) {
             logNetworkFailure(e, "POST /api/users/admin")
-            AppResult.Error(connectivityMessage(e), e)
+            networkFailure(e, "Не удалось создать администратора")
         } catch (e: Exception) {
             logNetworkFailure(e, "POST /api/users/admin")
-            AppResult.Error("Не удалось создать администратора", e)
+            unknownFailure(e, "Не удалось создать администратора")
         }
 
     override suspend fun getUsersForOperationFilters(): AppResult<List<UserPick>> =
@@ -139,12 +141,12 @@ class UserRepositoryImpl(
         } catch (e: ApiException) {
             logApiException(e, "GET /api/users/for-operation-filters")
             handleUnauthorized(e)
-            AppResult.Error(e.message ?: "Не удалось загрузить список пользователей", e)
+            apiFailure(e)
         } catch (e: IOException) {
             logNetworkFailure(e, "GET /api/users/for-operation-filters")
-            AppResult.Error(connectivityMessage(e), e)
+            networkFailure(e, "Не удалось загрузить список пользователей")
         } catch (e: Exception) {
             logNetworkFailure(e, "GET /api/users/for-operation-filters")
-            AppResult.Error("Не удалось загрузить список пользователей", e)
+            unknownFailure(e, "Не удалось загрузить список пользователей")
         }
 }

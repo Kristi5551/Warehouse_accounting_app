@@ -1,4 +1,4 @@
-package com.example.warehouse_accounting_app.core.navigation
+﻿package com.example.warehouse_accounting_app.core.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
+import com.example.warehouse_accounting_app.di.WarehouseViewModelFactory
 import com.example.warehouse_accounting_app.domain.model.RolePermissions
 import com.example.warehouse_accounting_app.presentation.auth.login.LoginScreen
 import com.example.warehouse_accounting_app.presentation.auth.register.RegisterScreen

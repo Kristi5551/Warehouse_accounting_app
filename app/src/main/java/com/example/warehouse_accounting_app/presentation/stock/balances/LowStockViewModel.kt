@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.warehouse_accounting_app.domain.result.AppResult
 import com.example.warehouse_accounting_app.domain.usecase.stock.GetLowStockUseCase
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -42,7 +43,7 @@ class LowStockViewModel(
                     }
                 }
                 is AppResult.Error -> {
-                    val msg = r.message
+                    val msg = r.toUserMessage()
                     _state.update {
                         it.copy(
                             isLoading = false,

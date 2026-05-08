@@ -6,6 +6,9 @@ package com.example.warehouse_accounting_app.domain.result
  * в слои domain и presentation без утечки транспортных деталей.
  */
 sealed class AppError(open val message: String) {
+    /** 400 — некорректные данные запроса. */
+    data class Validation(override val message: String) : AppError(message)
+
     /**
      * 401 или иная ситуация, когда с точки зрения приложения нужен новый вход.
      * Для [AuthRepository.getCurrentUser] предпочтительнее [SessionExpired], если токен уже очищен.
@@ -22,6 +25,12 @@ sealed class AppError(open val message: String) {
      * 403 без признаков «сессия мёртва»: токен не очищается автоматически (например нестандартный ответ /me).
      */
     data class Forbidden(override val message: String) : AppError(message)
+
+    /** 404 — сущность не найдена. */
+    data class NotFound(override val message: String) : AppError(message)
+
+    /** 409 — конфликт (например недостаточно товара на складе). */
+    data class Conflict(override val message: String) : AppError(message)
 
     /** Сеть недоступна, таймаут, хост не найден. */
     data class Network(override val message: String) : AppError(message)

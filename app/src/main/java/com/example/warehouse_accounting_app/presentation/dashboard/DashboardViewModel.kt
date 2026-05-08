@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.warehouse_accounting_app.domain.result.AppError
 import com.example.warehouse_accounting_app.domain.result.AppResult
+import com.example.warehouse_accounting_app.presentation.common.toUserMessage
 import com.example.warehouse_accounting_app.domain.usecase.auth.GetCurrentUserUseCase
 import com.example.warehouse_accounting_app.domain.usecase.auth.LogoutUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +41,7 @@ class DashboardViewModel(
                                 it.copy(
                                     user = null,
                                     isLoading = false,
-                                    errorMessage = result.message,
+                                    errorMessage = result.toUserMessage(),
                                 )
                             }
                         }

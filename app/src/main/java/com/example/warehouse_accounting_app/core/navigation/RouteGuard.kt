@@ -1,4 +1,4 @@
-package com.example.warehouse_accounting_app.core.navigation
+﻿package com.example.warehouse_accounting_app.core.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
+import com.example.warehouse_accounting_app.di.WarehouseViewModelFactory
 import com.example.warehouse_accounting_app.core.ui.components.AccessDeniedScreen
 import com.example.warehouse_accounting_app.core.ui.components.AppScaffold
 import com.example.warehouse_accounting_app.core.ui.components.AppTopBar

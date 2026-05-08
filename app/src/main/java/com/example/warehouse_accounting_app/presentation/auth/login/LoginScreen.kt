@@ -1,4 +1,4 @@
-package com.example.warehouse_accounting_app.presentation.auth.login
+﻿package com.example.warehouse_accounting_app.presentation.auth.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.warehouse_accounting_app.core.di.WarehouseViewModelFactory
+import com.example.warehouse_accounting_app.di.WarehouseViewModelFactory
 import com.example.warehouse_accounting_app.core.ui.components.AppButton
 import com.example.warehouse_accounting_app.core.ui.components.AppOutlinedButton
 import com.example.warehouse_accounting_app.core.ui.components.AppPasswordTextField
